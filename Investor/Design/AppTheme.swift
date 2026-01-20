@@ -24,9 +24,14 @@ struct AppTheme {
         // Accent
         static let accent = Color.accentColor
 
-        // Backgrounds (SwiftUI adaptive colors - work on all platforms)
-        static let primaryBackground = Color(.sRGBLinear, red: 0.95, green: 0.95, blue: 0.98, opacity: 1)
-        static let secondaryBackground = Color(.sRGBLinear, red: 0.92, green: 0.92, blue: 0.96, opacity: 1)
+        // Backgrounds
+        #if os(macOS)
+        static let primaryBackground = Color(nsColor: .controlBackgroundColor)
+        static let secondaryBackground = Color(nsColor: .unemphasizedSelectedContentBackgroundColor)
+        #else
+        static let primaryBackground = Color(uiColor: .systemBackground)
+        static let secondaryBackground = Color(uiColor: .secondarySystemBackground)
+        #endif
     }
 
     // MARK: - Typography
@@ -133,5 +138,47 @@ extension View {
                 RoundedRectangle(cornerRadius: AppTheme.CornerRadius.md)
                     .fill(isSelected ? .regularMaterial : .ultraThinMaterial)
             }
+    }
+    
+    /// Applies glass effect union to combine multiple views with matching ID
+    func glassEffectUnion<ID: Hashable>(id: ID, namespace: Namespace.ID, in shape: some InsettableShape = .rect(cornerRadius: AppTheme.CornerRadius.md)) -> some View {
+        self
+            .background {
+                shape
+                    .fill(.clear)
+                    .matchedGeometryEffect(id: id, in: namespace, properties: .frame, isSource: true)
+            }
+    }
+}
+
+// MARK: - Glass Effect Container
+
+struct GlassEffectContainer<Content: View>: View {
+    @ViewBuilder let content: Content
+    @Namespace private var glassNamespace
+    
+    var body: some View {
+        ZStack {
+            // Background glass effect that will match all union views
+            RoundedRectangle(cornerRadius: AppTheme.CornerRadius.md)
+                .fill(.regularMaterial)
+                .matchedGeometryEffect(id: 1, in: glassNamespace, properties: .frame, isSource: false)
+            
+            content
+                .environment(\.glassEffectNamespace, glassNamespace)
+        }
+    }
+}
+
+// MARK: - Environment Key for Glass Effect Namespace
+
+private struct GlassEffectNamespaceKey: EnvironmentKey {
+    static let defaultValue: Namespace.ID? = nil
+}
+
+extension EnvironmentValues {
+    var glassEffectNamespace: Namespace.ID? {
+        get { self[GlassEffectNamespaceKey.self] }
+        set { self[GlassEffectNamespaceKey.self] = newValue }
     }
 }
