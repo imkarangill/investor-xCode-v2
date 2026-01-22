@@ -23,12 +23,3 @@ struct InvestorApp: App {
         #endif
     }
 }
-
-#if os(macOS)
-struct SettingsView: View {
-    var body: some View {
-        Text("Settings")
-            .padding()
-    }
-}
-#endif

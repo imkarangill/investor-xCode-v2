@@ -37,6 +37,7 @@ struct ContentView: View {
                                 .frame(width: 50, height: 50)
                                 .contentTransition(.symbolEffect)
                         }
+                        .buttonStyle(.plain)
                         .glassEffect(.regular.interactive(), in: .circle)
 
                         HStack(spacing: 8) {
@@ -44,6 +45,7 @@ struct ContentView: View {
                                 .font(.callout)
                                 .foregroundStyle(.secondary)
                             TextField("Search stocks, ETFs...", text: $searchText)
+                                .textFieldStyle(.plain)
                                 .submitLabel(.search)
                                 .focused($isKeyboardActive)
                         }
@@ -64,6 +66,7 @@ struct ContentView: View {
                                 .frame(width: 50, height: 50)
                                 .contentTransition(.symbolEffect)
                         }
+                        .buttonStyle(.plain)
                         .glassEffect(.regular.interactive(), in: .circle)
                         .transition(.scale.combined(with: .opacity))
                     } else {
@@ -76,6 +79,7 @@ struct ContentView: View {
                                     .font(.title)
                                     .foregroundStyle(currentView == "home" ? .blue : .primary)
                             }
+                            .buttonStyle(.plain)
 
                             Button {
                                 currentView = "settings"
@@ -84,6 +88,7 @@ struct ContentView: View {
                                     .font(.title)
                                     .foregroundStyle(currentView == "settings" ? .blue : .primary)
                             }
+                            .buttonStyle(.plain)
                         }
                         .padding(.horizontal, 20)
                         .frame(height: 50)
@@ -103,6 +108,7 @@ struct ContentView: View {
                                     .font(.title)
                                     .frame(width: 50, height: 50)
                             }
+                            .buttonStyle(.plain)
                             .glassEffect(.regular.interactive(), in: .circle)
                             .transition(.scale.combined(with: .opacity))
                         }
