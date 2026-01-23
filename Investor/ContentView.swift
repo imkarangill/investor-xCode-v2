@@ -12,6 +12,7 @@ struct ContentView: View {
     @FocusState private var isKeyboardActive: Bool
     @State private var isSearchActive: Bool = false
     @State private var currentView: String = "home"
+    @AppStorage("appTheme") private var selectedTheme: String = AppThemePreference.system.rawValue
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -21,6 +22,7 @@ struct ContentView: View {
             } else {
                 SettingsView()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .id(selectedTheme)
             }
 
             VStack(spacing: 0) {
@@ -122,9 +124,15 @@ struct ContentView: View {
             .background {
                 ConcentricRectangle(corners: .concentric, isUniform: true)
                     .fill(.black.opacity(0.001))
+                    .allowsHitTesting(false)
             }
             .ignoresSafeArea()
         }
+        .preferredColorScheme(currentTheme.colorScheme)
+    }
+
+    private var currentTheme: AppThemePreference {
+        AppThemePreference(rawValue: selectedTheme) ?? .system
     }
 }
 
