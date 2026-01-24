@@ -32,6 +32,25 @@ struct PeriodMetrics: Codable, Equatable {
     static let periodLabels = ["5y", "3y", "2y", "1y", "6m"]
 }
 
+// MARK: - Stock List Item
+
+struct StockListItem: Codable, Identifiable, Equatable {
+    let symbol: String
+    let companyName: String?
+    let currency: String?
+    let exchange: String?
+    let industry: String?
+    let sector: String?
+    let country: String?
+    let image: String?
+    let isEtf: Bool?
+    let isActivelyTrading: Bool?
+    let isAdr: Bool?
+    let isFund: Bool?
+
+    var id: String { symbol }
+}
+
 // MARK: - Stock Profile
 
 struct StockProfile: Codable {

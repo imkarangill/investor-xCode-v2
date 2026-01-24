@@ -9,8 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var searchText: String = ""
-    @FocusState private var isKeyboardActive: Bool
-    @State private var isSearchActive: Bool = false
+    @State private var showSearchPopup: Bool = false
     @State private var currentView: String = "home"
     @AppStorage("appTheme") private var selectedTheme: String = AppThemePreference.system.rawValue
 
@@ -29,96 +28,47 @@ struct ContentView: View {
                 Spacer()
 
                 HStack(spacing: 12) {
-                    if isSearchActive {
-                        // Search active state
+                    HStack(spacing: 16) {
                         Button {
-                            // Market selection action
+                            currentView = "home"
                         } label: {
-                            Image(systemName: "globe")
+                            Image(systemName: "house.fill")
                                 .font(.title)
-                                .frame(width: 50, height: 50)
-                                .contentTransition(.symbolEffect)
+                                .foregroundStyle(currentView == "home" ? .blue : .primary)
                         }
                         .buttonStyle(.plain)
-                        .glassEffect(.regular.interactive(), in: .circle)
 
-                        HStack(spacing: 8) {
+                        Button {
+                            currentView = "settings"
+                        } label: {
+                            Image(systemName: "gearshape.fill")
+                                .font(.title)
+                                .foregroundStyle(currentView == "settings" ? .blue : .primary)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    .padding(.horizontal, 20)
+                    .frame(height: 50)
+                    .glassEffect(.regular.interactive(), in: .capsule)
+                    .transition(.scale.combined(with: .opacity))
+
+                    Spacer()
+
+                    if currentView == "home" {
+                        Button {
+                            showSearchPopup = true
+                        } label: {
                             Image(systemName: "magnifyingglass")
-                                .font(.callout)
-                                .foregroundStyle(.secondary)
-                            TextField("Search stocks, ETFs...", text: $searchText)
-                                .textFieldStyle(.plain)
-                                .submitLabel(.search)
-                                .focused($isKeyboardActive)
-                        }
-                        .padding(.horizontal, 16)
-                        .frame(height: 50)
-                        .glassEffect(.regular.interactive(), in: .capsule)
-                        .transition(.scale.combined(with: .opacity))
-
-                        Button {
-                            withAnimation(.smooth(duration: 0.25)) {
-                                isSearchActive = false
-                                isKeyboardActive = false
-                                searchText = ""
-                            }
-                        } label: {
-                            Image(systemName: "xmark")
                                 .font(.title)
                                 .frame(width: 50, height: 50)
-                                .contentTransition(.symbolEffect)
                         }
                         .buttonStyle(.plain)
                         .glassEffect(.regular.interactive(), in: .circle)
                         .transition(.scale.combined(with: .opacity))
-                    } else {
-                        // Default state
-                        HStack(spacing: 16) {
-                            Button {
-                                currentView = "home"
-                            } label: {
-                                Image(systemName: "house.fill")
-                                    .font(.title)
-                                    .foregroundStyle(currentView == "home" ? .blue : .primary)
-                            }
-                            .buttonStyle(.plain)
-
-                            Button {
-                                currentView = "settings"
-                            } label: {
-                                Image(systemName: "gearshape.fill")
-                                    .font(.title)
-                                    .foregroundStyle(currentView == "settings" ? .blue : .primary)
-                            }
-                            .buttonStyle(.plain)
-                        }
-                        .padding(.horizontal, 20)
-                        .frame(height: 50)
-                        .glassEffect(.regular.interactive(), in: .capsule)
-                        .transition(.scale.combined(with: .opacity))
-
-                        Spacer()
-
-                        if currentView == "home" {
-                            Button {
-                                withAnimation(.smooth(duration: 0.25)) {
-                                    isSearchActive = true
-                                    isKeyboardActive = true
-                                }
-                            } label: {
-                                Image(systemName: "magnifyingglass")
-                                    .font(.title)
-                                    .frame(width: 50, height: 50)
-                            }
-                            .buttonStyle(.plain)
-                            .glassEffect(.regular.interactive(), in: .circle)
-                            .transition(.scale.combined(with: .opacity))
-                        }
                     }
                 }
                 .padding(.horizontal, 16)
                 .padding(.bottom, 32)
-                .animation(.smooth(duration: 0.25), value: isSearchActive)
                 .animation(.smooth(duration: 0.25), value: currentView)
             }
             .background {
@@ -127,6 +77,16 @@ struct ContentView: View {
                     .allowsHitTesting(false)
             }
             .ignoresSafeArea()
+
+            // Search popup overlay
+            SearchPop(
+                isPresented: $showSearchPopup,
+                searchText: $searchText,
+                onSearch: { query in
+                    print("Searching for: \(query)")
+                    showSearchPopup = false
+                }
+            )
         }
         .preferredColorScheme(currentTheme.colorScheme)
     }

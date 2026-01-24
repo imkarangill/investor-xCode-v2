@@ -10,9 +10,14 @@ import SwiftData
 
 @main
 struct InvestorApp: App {
+    @StateObject private var stockListService = StockListService.shared
+
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .task {
+                    await stockListService.initialize()
+                }
         }
         .modelContainer(for: []) // Add SwiftData models here when needed
 

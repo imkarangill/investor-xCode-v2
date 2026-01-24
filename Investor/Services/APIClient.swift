@@ -19,7 +19,7 @@ actor APIClient {
     // For development, you can set this via environment variable or config file
     private var userKey: String {
         // Try to get from environment or use placeholder
-        ProcessInfo.processInfo.environment["INVESTOR_USER_KEY"] ?? ""
+        ProcessInfo.processInfo.environment["INVESTOR_ADMIN_KEY"] ?? ""
     }
 
     private let session: URLSession
@@ -41,6 +41,12 @@ actor APIClient {
     /// Fetch stock overview data
     func fetchStockOverview(symbol: String) async throws -> StockOverview {
         let endpoint = "/api/\(apiVersion)/stock/\(symbol.uppercased())/overview"
+        return try await fetch(endpoint: endpoint)
+    }
+
+    /// Fetch list of all stocks for a country
+    func fetchStockList(country: String = "US") async throws -> [StockListItem] {
+        let endpoint = "/api/\(apiVersion)/stock/list?country=\(country)"
         return try await fetch(endpoint: endpoint)
     }
 
