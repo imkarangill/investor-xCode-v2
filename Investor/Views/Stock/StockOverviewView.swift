@@ -140,10 +140,8 @@ struct StockOverviewView: View {
                 }
             }
         }
-        .onAppear {
-            Task {
-                await service.fetchOverview(for: symbol)
-            }
+        .task(id: symbol) {
+            await service.fetchOverview(for: symbol)
         }
     }
 }

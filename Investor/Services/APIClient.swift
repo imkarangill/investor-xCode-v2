@@ -80,12 +80,14 @@ actor APIClient {
             do {
                 return try decoder.decode(T.self, from: data)
             } catch {
-                print("Decoding error: \(error)")
                 throw APIClientError.decodingError(error)
             }
 
         case 401:
             throw APIClientError.unauthorized
+
+        case 403:
+            throw APIClientError.forbidden
 
         case 404:
             throw APIClientError.notFound
@@ -105,6 +107,7 @@ enum APIClientError: LocalizedError {
     case invalidURL
     case invalidResponse
     case unauthorized
+    case forbidden
     case notFound
     case serverError(Int)
     case httpError(Int)
@@ -118,6 +121,8 @@ enum APIClientError: LocalizedError {
             return "Invalid response from server"
         case .unauthorized:
             return "Unauthorized. Please check your API key."
+        case .forbidden:
+            return "Access forbidden. You may have reached the rate limit or don't have permission for this resource."
         case .notFound:
             return "Stock not found"
         case .serverError(let code):

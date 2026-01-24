@@ -40,7 +40,6 @@ class StockService: ObservableObject {
             lastUpdated = Date()
         } catch {
             self.error = error
-            print("Error fetching stock overview: \(error)")
         }
 
         isLoading = false

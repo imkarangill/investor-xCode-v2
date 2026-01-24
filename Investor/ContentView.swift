@@ -12,6 +12,7 @@ struct ContentView: View {
     @State private var showSearchPopup: Bool = false
     @State private var currentView: String = "home"
     @State private var selectedStock: String? = nil
+    @StateObject private var stockService = StockService()
     @AppStorage("appTheme") private var selectedTheme: String = AppThemePreference.system.rawValue
 
     var body: some View {
@@ -20,7 +21,7 @@ struct ContentView: View {
                 HomeView()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if currentView == "stock", let symbol = selectedStock {
-                StockOverviewView(service: StockService(), symbol: symbol)
+                StockOverviewView(service: stockService, symbol: symbol)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 SettingsView()
@@ -107,6 +108,7 @@ struct ContentView: View {
                 isPresented: $showSearchPopup,
                 searchText: $searchText,
                 onSearch: { symbol in
+                    stockService.clear() // Clear previous data
                     selectedStock = symbol
                     currentView = "stock"
                     showSearchPopup = false
