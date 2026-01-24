@@ -7,15 +7,120 @@
 
 import SwiftUI
 
+struct Country: Identifiable, Equatable {
+    let code: String
+    let name: String
+    var id: String { code }
+}
+
 struct SearchPop: View {
     @Binding var isPresented: Bool
     @Binding var searchText: String
     @FocusState private var isKeyboardActive: Bool
     @StateObject private var viewModel = StockSearchViewModel()
+    @AppStorage("selectedCountryCode") private var selectedCountryCode: String = "US"
 
     @State private var localSearchText: String = ""
+    @State private var showMarketSelection: Bool = false
 
     var onSearch: (String) -> Void
+
+    // Countries list
+    private let countries: [Country] = [
+        .init(code: "AE", name: "United Arab Emirates"),
+        .init(code: "AI", name: "Anguilla"),
+        .init(code: "AR", name: "Argentina"),
+        .init(code: "AT", name: "Austria"),
+        .init(code: "AU", name: "Australia"),
+        .init(code: "AZ", name: "Azerbaijan"),
+        .init(code: "BB", name: "Barbados"),
+        .init(code: "BE", name: "Belgium"),
+        .init(code: "BG", name: "Bulgaria"),
+        .init(code: "BM", name: "Bermuda"),
+        .init(code: "BR", name: "Brazil"),
+        .init(code: "BS", name: "Bahamas"),
+        .init(code: "CA", name: "Canada"),
+        .init(code: "CH", name: "Switzerland"),
+        .init(code: "CI", name: "Côte d'Ivoire"),
+        .init(code: "CL", name: "Chile"),
+        .init(code: "CN", name: "China"),
+        .init(code: "CO", name: "Colombia"),
+        .init(code: "CR", name: "Costa Rica"),
+        .init(code: "CW", name: "Curaçao"),
+        .init(code: "CY", name: "Cyprus"),
+        .init(code: "CZ", name: "Czech Republic"),
+        .init(code: "DE", name: "Germany"),
+        .init(code: "DK", name: "Denmark"),
+        .init(code: "DO", name: "Dominican Republic"),
+        .init(code: "EE", name: "Estonia"),
+        .init(code: "EG", name: "Egypt"),
+        .init(code: "ES", name: "Spain"),
+        .init(code: "FI", name: "Finland"),
+        .init(code: "FK", name: "Falkland Islands"),
+        .init(code: "FR", name: "France"),
+        .init(code: "GB", name: "United Kingdom"),
+        .init(code: "GE", name: "Georgia"),
+        .init(code: "GG", name: "Guernsey"),
+        .init(code: "GI", name: "Gibraltar"),
+        .init(code: "GR", name: "Greece"),
+        .init(code: "HK", name: "Hong Kong"),
+        .init(code: "HU", name: "Hungary"),
+        .init(code: "ID", name: "Indonesia"),
+        .init(code: "IE", name: "Ireland"),
+        .init(code: "IL", name: "Israel"),
+        .init(code: "IM", name: "Isle of Man"),
+        .init(code: "IN", name: "India"),
+        .init(code: "IS", name: "Iceland"),
+        .init(code: "IT", name: "Italy"),
+        .init(code: "JE", name: "Jersey"),
+        .init(code: "JO", name: "Jordan"),
+        .init(code: "JP", name: "Japan"),
+        .init(code: "KH", name: "Cambodia"),
+        .init(code: "KR", name: "South Korea"),
+        .init(code: "KY", name: "Cayman Islands"),
+        .init(code: "KZ", name: "Kazakhstan"),
+        .init(code: "LI", name: "Liechtenstein"),
+        .init(code: "LT", name: "Lithuania"),
+        .init(code: "LU", name: "Luxembourg"),
+        .init(code: "MC", name: "Monaco"),
+        .init(code: "ME", name: "Montenegro"),
+        .init(code: "MK", name: "North Macedonia"),
+        .init(code: "MN", name: "Mongolia"),
+        .init(code: "MO", name: "Macau"),
+        .init(code: "MT", name: "Malta"),
+        .init(code: "MU", name: "Mauritius"),
+        .init(code: "MX", name: "Mexico"),
+        .init(code: "MY", name: "Malaysia"),
+        .init(code: "NA", name: "Namibia"),
+        .init(code: "NG", name: "Nigeria"),
+        .init(code: "NL", name: "Netherlands"),
+        .init(code: "NO", name: "Norway"),
+        .init(code: "NZ", name: "New Zealand"),
+        .init(code: "PA", name: "Panama"),
+        .init(code: "PE", name: "Peru"),
+        .init(code: "PG", name: "Papua New Guinea"),
+        .init(code: "PH", name: "Philippines"),
+        .init(code: "PL", name: "Poland"),
+        .init(code: "PR", name: "Puerto Rico"),
+        .init(code: "PT", name: "Portugal"),
+        .init(code: "RO", name: "Romania"),
+        .init(code: "RU", name: "Russia"),
+        .init(code: "SE", name: "Sweden"),
+        .init(code: "SG", name: "Singapore"),
+        .init(code: "SK", name: "Slovakia"),
+        .init(code: "SR", name: "Suriname"),
+        .init(code: "TC", name: "Turks and Caicos Islands"),
+        .init(code: "TH", name: "Thailand"),
+        .init(code: "TR", name: "Turkey"),
+        .init(code: "TW", name: "Taiwan"),
+        .init(code: "TZ", name: "Tanzania"),
+        .init(code: "UA", name: "Ukraine"),
+        .init(code: "US", name: "United States"),
+        .init(code: "UY", name: "Uruguay"),
+        .init(code: "VG", name: "British Virgin Islands"),
+        .init(code: "VN", name: "Vietnam"),
+        .init(code: "ZA", name: "South Africa")
+    ]
 
     var body: some View {
         ZStack {
@@ -28,105 +133,15 @@ struct SearchPop: View {
                     }
                     .transition(.opacity)
 
-                // Search popup with glass effect
-                VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
-                    // Search bar
-                    HStack(spacing: AppTheme.Spacing.sm) {
-                        // Globe icon
-                        Button {
-                            // Market selection action
-                        } label: {
-                            VStack (spacing: AppTheme.Spacing.xxxs){
-                                Text(flagEmoji("US"))
-                                    .font(.title2)
-                                    .foregroundStyle(.primary)
-                                    .frame(width: 44, height: 44)
-                            }
-                        }
-                        .buttonStyle(.plain)
-                        .background {
-                            Circle()
-                                .fill(.ultraThinMaterial)
-                        }
-
-                        // Search field
-                        HStack(spacing: AppTheme.Spacing.xs) {
-                            Image(systemName: "magnifyingglass")
-                                .font(.callout)
-                                .foregroundStyle(.secondary)
-
-                            TextField("Search stocks, ETFs...", text: $localSearchText)
-                                .textFieldStyle(.plain)
-                                .submitLabel(.search)
-                                .textInputAutocapitalization(.never)
-                                    .autocorrectionDisabled(true)
-                                    .keyboardType(.asciiCapable)
-                                .focused($isKeyboardActive)
-                                .onChange(of: localSearchText) { _, newValue in
-                                    viewModel.searchText = newValue
-                                    viewModel.updateSearchSuggestions(for: newValue)
-                                }
-                                .onSubmit {
-                                    if let stock = viewModel.getSelectedSuggestion() {
-                                        handleStockSelection(stock)
-                                    }
-                                }
-                                #if os(macOS)
-                                .onKeyPress(.downArrow) {
-                                    viewModel.navigateSuggestions(direction: .down)
-                                    return .handled
-                                }
-                                .onKeyPress(.upArrow) {
-                                    viewModel.navigateSuggestions(direction: .up)
-                                    return .handled
-                                }
-                                .onKeyPress(.escape) {
-                                    dismissPopup()
-                                    return .handled
-                                }
-                                #endif
-                        }
-                        .padding(.horizontal, AppTheme.Spacing.md)
-                        .frame(height: 44)
-                        .background {
-                            Capsule()
-                                .fill(.ultraThinMaterial)
-                        }
-
-                        // Close button (X)
-                        Button {
-                            dismissPopup()
-                        } label: {
-                            Image(systemName: "xmark")
-                                .font(.title2)
-                                .foregroundStyle(.primary)
-                                .frame(width: 44, height: 44)
-                        }
-                        .buttonStyle(.plain)
-                        .background {
-                            Circle()
-                                .fill(.ultraThinMaterial)
-                        }
-                    }
-                    .padding(.horizontal, AppTheme.Spacing.md)
-                    .padding(.top, AppTheme.Spacing.md)
-
-                    // Suggestions list
-                    if !viewModel.suggestions.isEmpty && isKeyboardActive {
-                        searchSuggestionsView
-                    }
+                if showMarketSelection {
+                    marketSelectionView
+                } else {
+                    searchView
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-                .background {
-                    RoundedRectangle(cornerRadius: AppTheme.CornerRadius.xl)
-                        .fill(.regularMaterial)
-                        .shadow(color: .black.opacity(0.2), radius: 20, x: 0, y: 10)
-                }
-                .padding(.horizontal, AppTheme.Spacing.md)
-                .transition(.scale.combined(with: .opacity))
             }
         }
         .animation(.smooth(duration: 0.3), value: isPresented)
+        .animation(.smooth(duration: 0.25), value: showMarketSelection)
         .onChange(of: isPresented) { _, newValue in
             if newValue {
                 // Auto-focus keyboard when popup appears
@@ -136,8 +151,195 @@ struct SearchPop: View {
             } else {
                 localSearchText = ""
                 viewModel.clearSearch()
+                showMarketSelection = false
             }
         }
+        .onChange(of: selectedCountryCode) { _, newCountryCode in
+            // Reload stock list when country changes
+            Task {
+                await StockListService.shared.fetchStocksForCountry(newCountryCode)
+            }
+        }
+    }
+
+    // MARK: - Search View
+
+    private var searchView: some View {
+        VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
+            // Search bar
+            HStack(spacing: AppTheme.Spacing.sm) {
+                // Globe icon
+                Button {
+                    withAnimation(.smooth(duration: 0.25)) {
+                        showMarketSelection = true
+                        isKeyboardActive = false
+                    }
+                } label: {
+                    Text(flagEmoji(selectedCountryCode))
+                        .font(.title2)
+                        .foregroundStyle(.primary)
+                        .frame(width: 44, height: 44)
+                        .background(
+                            Circle()
+                                .fill(.ultraThinMaterial)
+                        )
+                }
+                .buttonStyle(.plain)
+
+                // Search field
+                HStack(spacing: AppTheme.Spacing.xs) {
+                    Image(systemName: "magnifyingglass")
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+
+                    TextField("Search stocks, ETFs...", text: $localSearchText)
+                        .textFieldStyle(.plain)
+                        .submitLabel(.search)
+                        #if !os(macOS)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled(true)
+                        .keyboardType(.asciiCapable)
+                        #endif
+                        .focused($isKeyboardActive)
+                        .onChange(of: localSearchText) { _, newValue in
+                            viewModel.searchText = newValue
+                            viewModel.updateSearchSuggestions(for: newValue)
+                        }
+                        .onSubmit {
+                            if let stock = viewModel.getSelectedSuggestion() {
+                                handleStockSelection(stock)
+                            }
+                        }
+                }
+                .padding(.horizontal, AppTheme.Spacing.md)
+                .frame(height: 44)
+                .background(
+                    Capsule()
+                        .fill(.ultraThinMaterial)
+                )
+
+                // Close button (X)
+                Button {
+                    dismissPopup()
+                } label: {
+                    Image(systemName: "xmark")
+                        .font(.title2)
+                        .foregroundStyle(.primary)
+                        .frame(width: 44, height: 44)
+                        .background(
+                            Circle()
+                                .fill(.ultraThinMaterial)
+                        )
+                }
+                .buttonStyle(.plain)
+            }
+            .padding(.horizontal, AppTheme.Spacing.md)
+            .padding(.top, AppTheme.Spacing.md)
+
+            // Suggestions list
+            if !viewModel.suggestions.isEmpty && isKeyboardActive {
+                searchSuggestionsView
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .background(
+            RoundedRectangle(cornerRadius: AppTheme.CornerRadius.xl)
+                .fill(.regularMaterial)
+                .shadow(color: .black.opacity(0.2), radius: 20, x: 0, y: 10)
+        )
+        .padding(.horizontal, AppTheme.Spacing.md)
+        .transition(.scale.combined(with: .opacity))
+    }
+
+    // MARK: - Market Selection View
+
+    private var marketSelectionView: some View {
+        VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
+            // Header with title and close button
+            HStack {
+                Text("Markets")
+                    .font(.system(size: 20, weight: .semibold))
+                    .foregroundStyle(.primary)
+
+                Spacer()
+
+                Button {
+                    withAnimation(.smooth(duration: 0.25)) {
+                        showMarketSelection = false
+                    }
+                } label: {
+                    Image(systemName: "xmark")
+                        .font(.title2)
+                        .foregroundStyle(.red)
+                        .frame(width: 44, height: 44)
+                        .background(
+                            Circle()
+                                .fill(.ultraThinMaterial)
+                        )
+                }
+                .buttonStyle(.plain)
+            }
+            .padding(.horizontal, AppTheme.Spacing.md)
+            .padding(.top, AppTheme.Spacing.md)
+
+            // Countries list
+            ScrollView(.vertical, showsIndicators: true) {
+                LazyVStack(spacing: 0) {
+                    ForEach(countries) { country in
+                        Button {
+                            selectedCountryCode = country.code
+                            withAnimation(.smooth(duration: 0.25)) {
+                                showMarketSelection = false
+                            }
+                        } label: {
+                            HStack(spacing: AppTheme.Spacing.sm) {
+                                // Flag badge
+                                Text(flagEmoji(country.code))
+                                    .font(.title3)
+                                    .frame(width: 34, height: 34)
+                                    .background(
+                                        Circle()
+                                            .fill(.ultraThinMaterial)
+                                    )
+
+                                // Country name
+                                Text(country.name)
+                                    .font(.system(size: 15))
+                                    .foregroundStyle(.primary)
+
+                                Spacer()
+
+                                // Radio indicator
+                                Image(systemName: selectedCountryCode == country.code ? "checkmark.circle.fill" : "circle")
+                                    .font(.system(size: 20))
+                                    .foregroundStyle(selectedCountryCode == country.code ? .blue : .secondary)
+                            }
+                            .padding(.horizontal, AppTheme.Spacing.md)
+                            .padding(.vertical, AppTheme.Spacing.sm)
+                            .background(
+                                Rectangle()
+                                    .fill(selectedCountryCode == country.code ? .blue.opacity(0.1) : Color.clear)
+                            )
+                        }
+                        .buttonStyle(.plain)
+
+                        if country != countries.last {
+                            Divider()
+                                .padding(.leading, AppTheme.Spacing.md + 34 + AppTheme.Spacing.sm)
+                        }
+                    }
+                }
+            }
+            .padding(.bottom, AppTheme.Spacing.md)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .background(
+            RoundedRectangle(cornerRadius: AppTheme.CornerRadius.xl)
+                .fill(.regularMaterial)
+                .shadow(color: .black.opacity(0.2), radius: 20, x: 0, y: 10)
+        )
+        .padding(.horizontal, AppTheme.Spacing.md)
+        .transition(.scale.combined(with: .opacity))
     }
 
     private var searchSuggestionsView: some View {
@@ -263,6 +465,7 @@ struct SearchPop: View {
             searchText = ""
             localSearchText = ""
             viewModel.clearSearch()
+            showMarketSelection = false
         }
     }
 }

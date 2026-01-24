@@ -51,31 +51,37 @@ final class StockListService: ObservableObject {
 
         // Cache invalid or missing - fetch from API
         print("🌐 [StockList] Cache invalid, fetching from API...")
-        await fetchFromAPI(silentError: true)
+        await fetchFromAPI(country: "US", silentError: true)
         isInitialized = true
     }
 
     /// Force refresh stock list from API
     func refresh() async {
         print("🔄 [StockList] Force refresh requested")
-        await fetchFromAPI(silentError: false)
+        await fetchFromAPI(country: "US", silentError: false)
+    }
+
+    /// Fetch stocks for a specific country
+    func fetchStocksForCountry(_ countryCode: String) async {
+        print("🌍 [StockList] Fetching stocks for country: \(countryCode)")
+        await fetchFromAPI(country: countryCode, silentError: false)
     }
 
     // MARK: - Private Methods
 
-    private func fetchFromAPI(silentError: Bool) async {
+    private func fetchFromAPI(country: String, silentError: Bool) async {
         isLoading = true
         error = nil
 
         do {
-            let fetchedStocks = try await apiClient.fetchStockList(country: "US")
+            let fetchedStocks = try await apiClient.fetchStockList(country: country)
             stocks = fetchedStocks
             lastFetched = Date()
 
             // Save to cache
             await cache.saveList(fetchedStocks)
 
-            print("✅ [StockList] Fetched \(fetchedStocks.count) stocks from API")
+            print("✅ [StockList] Fetched \(fetchedStocks.count) stocks from API for \(country)")
         } catch {
             self.error = error
             if !silentError {
