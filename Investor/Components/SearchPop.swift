@@ -29,7 +29,7 @@ struct SearchPop: View {
                     .transition(.opacity)
 
                 // Search popup with glass effect
-                VStack(spacing: AppTheme.Spacing.md) {
+                VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
                     // Search bar
                     HStack(spacing: AppTheme.Spacing.sm) {
                         // Globe icon
@@ -110,14 +110,13 @@ struct SearchPop: View {
                     }
                     .padding(.horizontal, AppTheme.Spacing.md)
                     .padding(.top, AppTheme.Spacing.md)
-                    .padding(.bottom, AppTheme.Spacing.md)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
 
                     // Suggestions list
                     if !viewModel.suggestions.isEmpty && isKeyboardActive {
                         searchSuggestionsView
                     }
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
                 .background {
                     RoundedRectangle(cornerRadius: AppTheme.CornerRadius.xl)
                         .fill(.regularMaterial)
@@ -154,6 +153,49 @@ struct SearchPop: View {
                             handleStockSelection(stock)
                         }) {
                             HStack(spacing: AppTheme.Spacing.sm) {
+                                // Stock logo
+                                if let imageUrl = stock.image, let url = URL(string: imageUrl) {
+                                    AsyncImage(url: url) { phase in
+                                        switch phase {
+                                        case .empty:
+                                            Circle()
+                                                .fill(.blue.opacity(0.2))
+                                                .frame(width: 40, height: 40)
+                                                .overlay {
+                                                    ProgressView()
+                                                        .scaleEffect(0.6)
+                                                }
+                                        case .success(let image):
+                                            image
+                                                .resizable()
+                                                .aspectRatio(contentMode: .fill)
+                                                .frame(width: 40, height: 40)
+                                                .clipShape(Circle())
+                                        case .failure:
+                                            Circle()
+                                                .fill(.blue.opacity(0.2))
+                                                .frame(width: 40, height: 40)
+                                                .overlay {
+                                                    Text(String(stock.symbol.prefix(1)))
+                                                        .font(.system(size: 16, weight: .semibold))
+                                                        .foregroundStyle(.blue)
+                                                }
+                                        @unknown default:
+                                            EmptyView()
+                                        }
+                                    }
+                                } else {
+                                    // Fallback when no image URL
+                                    Circle()
+                                        .fill(.blue.opacity(0.2))
+                                        .frame(width: 40, height: 40)
+                                        .overlay {
+                                            Text(String(stock.symbol.prefix(1)))
+                                                .font(.system(size: 16, weight: .semibold))
+                                                .foregroundStyle(.blue)
+                                        }
+                                }
+
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(stock.symbol)
                                         .font(.system(size: 15, weight: .semibold))
@@ -205,7 +247,6 @@ struct SearchPop: View {
                     }
                 }
             }
-            .frame(maxHeight: 300)
             .padding(.bottom, AppTheme.Spacing.md)
         }
     }
