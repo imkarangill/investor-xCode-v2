@@ -29,7 +29,7 @@ struct StockLogoImage: View {
                         .resizable()
                         .aspectRatio(contentMode: .fill)
                         .frame(width: size, height: size)
-                        .clipShape(Circle())
+                        .clipShape(Rectangle())
                 case .failure:
                     Circle()
                         .fill(.blue.opacity(0.2))

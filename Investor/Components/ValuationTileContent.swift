@@ -14,7 +14,7 @@ struct ValuationTileContent: View {
         VStack(alignment: .leading, spacing: 0) {
             if let valuation = overview.valuation, !valuation.isEmpty {
                 // Header
-                Text("Valuation Metrics")
+                Text("Valuation")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .padding(.vertical, 8)

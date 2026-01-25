@@ -13,7 +13,7 @@ struct ReturnsTileContent: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             // Header row
-            GrowthTableHeader()
+            GrowthTableHeader(headerText: "Returns")
 
             Divider()
 

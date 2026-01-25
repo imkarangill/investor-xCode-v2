@@ -62,10 +62,13 @@ struct GrowthTableRow: View {
 // MARK: - Growth Table Header
 
 struct GrowthTableHeader: View {
+    let headerText: String
     var body: some View {
         HStack(spacing: 0) {
-            Text("")
+            Text(headerText)
                 .frame(width: 100, alignment: .leading)
+                .font(AppTheme.Typography.subheadline)
+                .bold()
 
             ForEach(PeriodMetrics.periodLabels, id: \.self) { period in
                 Text(period)
@@ -82,7 +85,7 @@ struct GrowthTableHeader: View {
 
 #Preview {
     VStack(alignment: .leading, spacing: 0) {
-        GrowthTableHeader()
+        GrowthTableHeader(headerText: "Growth")
 
         Divider()
 

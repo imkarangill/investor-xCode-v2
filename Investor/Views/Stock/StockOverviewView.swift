@@ -37,7 +37,13 @@ struct StockOverviewView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .padding(.top, 100)
                 } else if let overview = service.stockOverview {
-                    StockHeader(overview: overview)
+                    VStack() {
+                        StockHeader(overview: overview)
+                        GrowthTileContent(overview: overview)
+                        RatiosTileContent(overview: overview)
+                        ReturnsTileContent(overview: overview)
+                        ValuationTileContent(overview: overview)
+                    }
                 }
             }
             .frame(maxWidth: .infinity, alignment: .topLeading)
