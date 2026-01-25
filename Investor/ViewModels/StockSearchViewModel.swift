@@ -74,12 +74,6 @@ final class StockSearchViewModel: ObservableObject {
             .prefix(10)
             .map { $0.stock }
 
-        // Debug: Print all suggestions being shown on screen
-        print("🔍 [Search] Query '\(query)' returned \(suggestions.count) suggestions:")
-        for (index, stock) in suggestions.enumerated() {
-            print("  [\(index + 1)] \(stock.symbol) - \(stock.companyName ?? "N/A")")
-        }
-
         // Reset selection when suggestions change
         selectedSuggestionIndex = -1
     }
