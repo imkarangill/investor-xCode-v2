@@ -154,8 +154,8 @@ final class AuthenticationService: NSObject, ObservableObject {
         currentNonce = nonce
         let hashedNonce = sha256(nonce)
 
-        return try await Task.detached(priority: .high) { [weak self] () -> AuthResult in
-            return try await withCheckedThrowingContinuation { continuation in
+        return try await Task.detached(priority: .high) { [weak self] in
+            try await withCheckedThrowingContinuation { continuation in
                 let appleIDProvider = ASAuthorizationAppleIDProvider()
                 let request = appleIDProvider.createRequest()
                 request.requestedScopes = [.fullName, .email]
