@@ -361,11 +361,15 @@ private class AppleSignInDelegate: NSObject, ASAuthorizationControllerDelegate, 
                     authorization,
                     nonce: nonce
                 )
-                self?.completion(.success(result))
+                self?.callCompletion(.success(result))
             } catch {
-                self?.completion(.failure(error))
+                self?.callCompletion(.failure(error))
             }
         }
+    }
+
+    private func callCompletion(_ result: Result<AuthResult, Error>) {
+        completion(result)
     }
 
     func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {

@@ -9,7 +9,7 @@ import Foundation
 
 // MARK: - Period Metrics
 
-struct PeriodMetrics: Codable, Equatable {
+struct PeriodMetrics: Codable, Equatable, Sendable {
     let fiveYear: Double?
     let threeYear: Double?
     let twoYear: Double?
@@ -34,7 +34,7 @@ struct PeriodMetrics: Codable, Equatable {
 
 // MARK: - Stock List Item
 
-struct StockListItem: Codable, Identifiable, Equatable {
+struct StockListItem: Codable, Identifiable, Equatable, Sendable {
     let symbol: String
     let companyName: String?
     let currency: String?
@@ -53,7 +53,7 @@ struct StockListItem: Codable, Identifiable, Equatable {
 
 // MARK: - Stock Profile
 
-struct StockProfile: Codable {
+struct StockProfile: Codable, Sendable {
     let symbol: String
     let companyName: String?
     let price: Double?
@@ -79,7 +79,7 @@ struct StockProfile: Codable {
 
 // MARK: - Score Breakdown
 
-struct ScoreBreakdown: Codable {
+struct ScoreBreakdown: Codable, Sendable {
     let revenue: Int
     let operatingIncome: Int
     let freeCashFlow: Int
@@ -95,7 +95,7 @@ struct ScoreBreakdown: Codable {
 
 // MARK: - Score
 
-struct StockScore: Codable {
+struct StockScore: Codable, Sendable {
     let overall: Int
     let maxScore: Int
     let breakdown: ScoreBreakdown
@@ -103,7 +103,7 @@ struct StockScore: Codable {
 
 // MARK: - Growth Metrics
 
-struct GrowthMetrics: Codable {
+struct GrowthMetrics: Codable, Sendable {
     let revenue: PeriodMetrics
     let operatingIncome: PeriodMetrics
     let freeCashFlow: PeriodMetrics
@@ -112,14 +112,14 @@ struct GrowthMetrics: Codable {
 
 // MARK: - Returns Metrics
 
-struct ReturnsMetrics: Codable {
+struct ReturnsMetrics: Codable, Sendable {
     let roce: PeriodMetrics
     let fcfroce: PeriodMetrics
 }
 
 // MARK: - Ratios
 
-struct Ratios: Codable {
+struct Ratios: Codable, Sendable {
     let profitMargin: PeriodMetrics
     let debtToEquity: PeriodMetrics
     let liabilityToEquity: PeriodMetrics
@@ -129,7 +129,7 @@ struct Ratios: Codable {
 
 // MARK: - Momentum
 
-struct Momentum: Codable {
+struct Momentum: Codable, Sendable {
     let score: Double
     let signal: String
     let strength: String
@@ -139,7 +139,7 @@ struct Momentum: Codable {
 
 // MARK: - Earnings
 
-struct Earnings: Codable, Identifiable {
+struct Earnings: Codable, Identifiable, Sendable {
     let date: String
     let epsActual: Double?
     let epsEstimated: Double?
@@ -151,7 +151,7 @@ struct Earnings: Codable, Identifiable {
 
 // MARK: - Dividend
 
-struct Dividend: Codable, Identifiable {
+struct Dividend: Codable, Identifiable, Sendable {
     let date: String
     let amount: Double?
     let recordDate: String?
@@ -163,7 +163,7 @@ struct Dividend: Codable, Identifiable {
 
 // MARK: - Stock Overview Response
 
-struct StockOverview: Codable, Identifiable {
+struct StockOverview: Codable, Identifiable, Sendable {
     let symbol: String
     let lastUpdated: String?
     let profile: StockProfile
@@ -184,14 +184,14 @@ struct StockOverview: Codable, Identifiable {
 
 // MARK: - Price Point
 
-struct PricePoint: Codable {
+struct PricePoint: Codable, Sendable {
     let price: Double
     let date: String
 }
 
 // MARK: - API Metadata
 
-struct APIMetadata: Codable {
+struct APIMetadata: Codable, Sendable {
     let calculationsPerformed: Int?
     let cacheEnabled: Bool?
     let cacheTTL: Int?
@@ -200,7 +200,7 @@ struct APIMetadata: Codable {
 
 // MARK: - API Error
 
-struct APIError: Codable {
+struct APIError: Codable, Sendable {
     let error: String
 }
 

@@ -25,14 +25,20 @@ struct InvestorApp: App {
 
     var body: some Scene {
         WindowGroup {
-            if privilegeManager.isAuthenticated {
+            if !privilegeManager.isAuthenticated {
+                // State 1: Not authenticated
+                LoginView(privilegeManager: privilegeManager)
+                    .transition(.opacity)
+            } else if privilegeManager.needsSubscriptionFlow {
+                // State 2: Authenticated but needs subscription flow
+                SubscriptionOfferView()
+                    .transition(.opacity)
+            } else {
+                // State 3: Authenticated and completed subscription flow
                 ContentView()
                     .task {
                         await stockListService.initialize()
                     }
-                    .transition(.opacity)
-            } else {
-                LoginView(privilegeManager: privilegeManager)
                     .transition(.opacity)
             }
         }

@@ -18,9 +18,11 @@ final class PrivilegeManager: ObservableObject {
     @Published var currentUser: User?
     @Published var isAuthenticated: Bool = false
     @Published var showLoginSheet: Bool = false
+    @Published var hasCompletedSubscriptionFlow: Bool = false
 
     // MARK: - Private Properties
     private let userDefaultsKey = "com.investor.currentUser"
+    private let hasCompletedSubscriptionFlowKey = "com.investor.hasCompletedSubscriptionFlow"
 
     // Development bypass flag - set to true when running from Xcode
     #if DEBUG
@@ -29,6 +31,7 @@ final class PrivilegeManager: ObservableObject {
 
     private init() {
         loadUser()
+        loadSubscriptionFlowState()
 
         NotificationCenter.default.addObserver(
             self,
@@ -97,6 +100,8 @@ final class PrivilegeManager: ObservableObject {
         currentUser = user
         isAuthenticated = true
         saveUser()
+        // Check if subscription flow is needed for new free users
+        evaluateSubscriptionFlowState()
         print("✅ User signed in: \(user.email), Level: \(user.privilegeLevel.rawValue), Provider: \(user.authProvider.rawValue)")
     }
 
@@ -106,10 +111,12 @@ final class PrivilegeManager: ObservableObject {
 
         currentUser = nil
         isAuthenticated = false
+        hasCompletedSubscriptionFlow = false
         #if DEBUG
         developmentBypass = false
         #endif
         UserDefaults.standard.removeObject(forKey: userDefaultsKey)
+        UserDefaults.standard.removeObject(forKey: hasCompletedSubscriptionFlowKey)
 
         if wasOAuthUser {
             try? AuthenticationService.shared.signOut()
@@ -162,6 +169,43 @@ final class PrivilegeManager: ObservableObject {
     /// Sends tracking event to investor-api-service for usage monitoring
     func recordStockView(symbol: String) async throws {
         try await InvestorAPIService.shared.recordStockView(symbol: symbol)
+    }
+
+    // MARK: - Subscription Flow
+
+    /// Computed property to determine if subscription flow is needed
+    var needsSubscriptionFlow: Bool {
+        guard isAuthenticated, let user = currentUser else { return false }
+
+        // Skip flow if:
+        // 1. User has completed flow before
+        // 2. User has paid subscription (Pro, Max, Ultimate, Admin)
+        let hasCompleted = hasCompletedSubscriptionFlow
+        let isPaidTier = user.privilegeLevel != .free
+
+        return !hasCompleted && !isPaidTier
+    }
+
+    /// Mark subscription flow as complete
+    func completeSubscriptionFlow() {
+        UserDefaults.standard.set(true, forKey: hasCompletedSubscriptionFlowKey)
+        hasCompletedSubscriptionFlow = true
+    }
+
+    /// Private helper to evaluate subscription flow state based on current user
+    private func evaluateSubscriptionFlowState() {
+        guard let user = currentUser else { return }
+
+        // If user has paid tier, mark flow as complete
+        if user.privilegeLevel != .free {
+            UserDefaults.standard.set(true, forKey: hasCompletedSubscriptionFlowKey)
+            hasCompletedSubscriptionFlow = true
+        }
+    }
+
+    /// Load subscription flow state from UserDefaults
+    private func loadSubscriptionFlowState() {
+        hasCompletedSubscriptionFlow = UserDefaults.standard.bool(forKey: hasCompletedSubscriptionFlowKey)
     }
 
     // MARK: - Helpers

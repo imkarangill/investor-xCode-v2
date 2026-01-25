@@ -16,7 +16,7 @@ struct LoginView: View {
     @State private var isLoading: Bool = false
 
     var body: some View {
-        VStack(spacing: 160) {
+        VStack(spacing: 60) {
             // Header
             VStack(spacing: 20) {
                 Image("InvestorLogo")
@@ -25,15 +25,8 @@ struct LoginView: View {
                     .frame(width: 100, height: 100)
             }
 
-            VStack(spacing: 40) {
+            VStack(spacing: 12) {
 #if DEBUG
-//                Button(action: signInWithDevelopmentBypass) {
-//                    HStack {
-//                        Image(systemName: "hammer.fill")
-//                        Text("Development Bypass (Admin)")
-//                    }
-//                    .padding(.vertical, 12)
-//                }
                 Button(action: signInWithDevelopmentBypass) {
                     Label("Development Bypass (Admin)", systemImage: "hammer.fill")
                         .frame(maxWidth: 300)
@@ -79,20 +72,19 @@ struct LoginView: View {
                 ZStack {
                     Color.clear
                         .background(.ultraThinMaterial)
+                        .ignoresSafeArea()
 
                     VStack(spacing: 16) {
                         ProgressView()
                             .controlSize(.large)
-                        Text("Signing in...")
+                        Text("Signing in... to Investor")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .visualEffect { content, _ in
-                    let isLoading = self.isLoading
-                    return content.blur(radius: isLoading ? 0 : 10)
-                }
+                .ignoresSafeArea()
+                .blur(radius: 10)
                 .transition(.opacity)
             }
         }
