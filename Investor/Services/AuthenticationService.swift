@@ -152,13 +152,14 @@ final class AuthenticationService: NSObject, ObservableObject {
 
         let nonce = randomNonceString()
         currentNonce = nonce
+        let hashedNonce = sha256(nonce)
 
         return try await Task.detached(priority: .high) { [weak self] () -> AuthResult in
             return try await withCheckedThrowingContinuation { continuation in
                 let appleIDProvider = ASAuthorizationAppleIDProvider()
                 let request = appleIDProvider.createRequest()
                 request.requestedScopes = [.fullName, .email]
-                request.nonce = self?.sha256(nonce) ?? ""
+                request.nonce = hashedNonce
 
                 let authorizationController = ASAuthorizationController(authorizationRequests: [request])
 
@@ -188,7 +189,7 @@ final class AuthenticationService: NSObject, ObservableObject {
                     .OBJC_ASSOCIATION_RETAIN
                 )
             }
-        }.value
+        }
     }
 
     /// Handle Apple Sign-In credential
