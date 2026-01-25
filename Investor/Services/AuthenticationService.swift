@@ -154,41 +154,39 @@ final class AuthenticationService: NSObject, ObservableObject {
         currentNonce = nonce
         let hashedNonce = sha256(nonce)
 
-        return try await Task.detached(priority: .high) { [weak self] in
-            try await withCheckedThrowingContinuation { continuation in
-                let appleIDProvider = ASAuthorizationAppleIDProvider()
-                let request = appleIDProvider.createRequest()
-                request.requestedScopes = [.fullName, .email]
-                request.nonce = hashedNonce
+        return try await withCheckedThrowingContinuation { [weak self] continuation in
+            let appleIDProvider = ASAuthorizationAppleIDProvider()
+            let request = appleIDProvider.createRequest()
+            request.requestedScopes = [.fullName, .email]
+            request.nonce = hashedNonce
 
-                let authorizationController = ASAuthorizationController(authorizationRequests: [request])
+            let authorizationController = ASAuthorizationController(authorizationRequests: [request])
 
-                let delegate = AppleSignInDelegate { [weak self] result in
-                    switch result {
-                    case .success(let authResult):
-                        continuation.resume(returning: authResult)
-                    case .failure(let error):
-                        Task { @MainActor [weak self] in
-                            self?.errorMessage = "Apple Sign-In failed: \(error.localizedDescription)"
-                        }
-                        continuation.resume(throwing: error)
+            let delegate = AppleSignInDelegate { [weak self] result in
+                switch result {
+                case .success(let authResult):
+                    continuation.resume(returning: authResult)
+                case .failure(let error):
+                    Task { @MainActor [weak self] in
+                        self?.errorMessage = "Apple Sign-In failed: \(error.localizedDescription)"
                     }
+                    continuation.resume(throwing: error)
                 }
-
-                authorizationController.delegate = delegate
-                authorizationController.presentationContextProvider = delegate
-
-                DispatchQueue.main.async {
-                    authorizationController.performRequests()
-                }
-
-                objc_setAssociatedObject(
-                    authorizationController,
-                    "delegate",
-                    delegate,
-                    .OBJC_ASSOCIATION_RETAIN
-                )
             }
+
+            authorizationController.delegate = delegate
+            authorizationController.presentationContextProvider = delegate
+
+            DispatchQueue.main.async {
+                authorizationController.performRequests()
+            }
+
+            objc_setAssociatedObject(
+                authorizationController,
+                "delegate",
+                delegate,
+                .OBJC_ASSOCIATION_RETAIN
+            )
         }
     }
 
