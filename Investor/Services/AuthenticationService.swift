@@ -13,6 +13,7 @@
 import Foundation
 import AuthenticationServices
 import SwiftUI
+import Combine
 
 #if canImport(UIKit)
 import UIKit
@@ -48,6 +49,7 @@ final class AuthenticationService: NSObject, ObservableObject {
     @Published var errorMessage: String?
 
     private let keychainManager = KeychainManager.shared
+    private var authStateListener: NSObjectProtocol?
     var currentNonce: String?
 
     private override init() {
@@ -58,7 +60,7 @@ final class AuthenticationService: NSObject, ObservableObject {
     // MARK: - Auth State Listener
 
     private func setupAuthStateListener() {
-        Auth.auth().addStateDidChangeListener { [weak self] _, user in
+        authStateListener = Auth.auth().addStateDidChangeListener { [weak self] _, user in
             Task { @MainActor in
                 if let user = user {
                     try? await self?.handleAuthStateChange(firebaseUser: user)

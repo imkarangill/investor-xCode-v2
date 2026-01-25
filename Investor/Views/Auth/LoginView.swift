@@ -28,15 +28,21 @@ struct LoginView: View {
 
             VStack(spacing: 40) {
 #if DEBUG
+//                Button(action: signInWithDevelopmentBypass) {
+//                    HStack {
+//                        Image(systemName: "hammer.fill")
+//                        Text("Development Bypass (Admin)")
+//                    }
+//                    .padding(.vertical, 12)
+//                }
                 Button(action: signInWithDevelopmentBypass) {
-                    HStack {
-                        Image(systemName: "hammer.fill")
-                        Text("Development Bypass (Admin)")
-                    }
-                    .padding(.vertical, 12)
+                    Label("Development Bypass (Admin)", systemImage: "hammer.fill")
+                        .frame(maxWidth: 300)
+                        .padding(.vertical, 12)
                 }
-                .applyGlassEffect()
-                .tint(colorScheme == .dark ? .white : .black)
+                .buttonStyle(.plain)
+                .glassEffect(.regular.interactive(), in: .capsule)
+                .transition(.scale.combined(with: .opacity))
 
                 Divider()
 #endif
@@ -47,9 +53,9 @@ struct LoginView: View {
                         .frame(maxWidth: 300)
                         .padding(.vertical, 12)
                 }
-                .tint(colorScheme == .dark ? .white : .black)
-                .applyGlassEffect()
-                .disabled(isLoading)
+                .buttonStyle(.plain)
+                .glassEffect(.regular.interactive(), in: .capsule)
+                .transition(.scale.combined(with: .opacity))
 
                 // Google Sign-In
                 Button(action: signInWithGoogle) {
@@ -57,9 +63,9 @@ struct LoginView: View {
                         .frame(maxWidth: 300)
                         .padding(.vertical, 12)
                 }
-                .tint(colorScheme == .dark ? .white : .black)
-                .applyGlassEffect()
-                .disabled(isLoading)
+                .buttonStyle(.plain)
+                .glassEffect(.regular.interactive(), in: .capsule)
+                .transition(.scale.combined(with: .opacity))
             }
             .padding(.horizontal)
             .background(.background)
@@ -85,7 +91,7 @@ struct LoginView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .visualEffect { content, _ in
-                    content.blur(radius: isLoading ? 0 : 10)
+                    content.blur(radius: self.isLoading ? 0 : 10)
                 }
                 .transition(.opacity)
             }

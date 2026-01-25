@@ -8,10 +8,20 @@
 import SwiftUI
 import SwiftData
 
+#if canImport(FirebaseCore)
+import FirebaseCore
+#endif
+
 @main
 struct InvestorApp: App {
     @StateObject private var stockListService = StockListService.shared
     @StateObject private var privilegeManager = PrivilegeManager.shared
+
+    init() {
+        #if canImport(FirebaseCore)
+        FirebaseApp.configure()
+        #endif
+    }
 
     var body: some Scene {
         WindowGroup {

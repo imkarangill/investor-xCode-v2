@@ -40,6 +40,9 @@ final class StockListService: ObservableObject {
 
         print("🚀 [StockList] Initializing...")
 
+        // Migrate from old UserDefaults cache to file-based cache
+        await cache.migrateOldCache()
+
         // Try to load from cache first
         if let cachedStocks = await cache.getCachedList() {
             stocks = cachedStocks
