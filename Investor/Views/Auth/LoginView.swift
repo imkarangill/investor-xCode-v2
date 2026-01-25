@@ -10,7 +10,6 @@ import SwiftUI
 /// Login and subscription view
 struct LoginView: View {
     @ObservedObject var privilegeManager: PrivilegeManager
-    @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) private var colorScheme
     @State private var showError: Bool = false
     @State private var errorMessage: String = ""
@@ -107,9 +106,8 @@ struct LoginView: View {
             do {
                 try await privilegeManager.signInWithGoogle()
                 await MainActor.run {
-                    print("[LoginView] Google sign-in successful, dismissing view")
+                    print("[LoginView] Google sign-in successful, transitioning to main app")
                     withAnimation { isLoading = false }
-                    dismiss()
                 }
             } catch {
                 await MainActor.run {
@@ -136,9 +134,8 @@ struct LoginView: View {
             do {
                 try await privilegeManager.signInWithApple()
                 await MainActor.run {
-                    print("[LoginView] Apple sign-in successful, dismissing view")
+                    print("[LoginView] Apple sign-in successful, transitioning to main app")
                     withAnimation { isLoading = false }
-                    dismiss()
                 }
             } catch {
                 await MainActor.run {
@@ -161,7 +158,6 @@ struct LoginView: View {
     private func signInWithDevelopmentBypass() {
         print("[LoginView] Development bypass initiated")
         privilegeManager.signInWithDevelopmentBypass()
-        dismiss()
     }
 }
 
