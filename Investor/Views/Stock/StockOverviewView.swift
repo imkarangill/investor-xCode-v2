@@ -37,13 +37,7 @@ struct StockOverviewView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .padding(.top, 100)
                 } else if let overview = service.stockOverview {
-                    // UI cleared - ready for redesign
-                    VStack {
-                        Text("Ready for redesign")
-                            .foregroundStyle(.secondary)
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .padding()
+                    StockHeader(overview: overview)
                 }
             }
         }

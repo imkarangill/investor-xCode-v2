@@ -356,47 +356,7 @@ struct SearchPop: View {
                         }) {
                             HStack(spacing: AppTheme.Spacing.sm) {
                                 // Stock logo
-                                if let imageUrl = stock.image, let url = URL(string: imageUrl) {
-                                    AsyncImage(url: url) { phase in
-                                        switch phase {
-                                        case .empty:
-                                            Circle()
-                                                .fill(.blue.opacity(0.2))
-                                                .frame(width: 40, height: 40)
-                                                .overlay {
-                                                    ProgressView()
-                                                        .scaleEffect(0.6)
-                                                }
-                                        case .success(let image):
-                                            image
-                                                .resizable()
-                                                .aspectRatio(contentMode: .fill)
-                                                .frame(width: 40, height: 40)
-                                                .clipShape(Circle())
-                                        case .failure:
-                                            Circle()
-                                                .fill(.blue.opacity(0.2))
-                                                .frame(width: 40, height: 40)
-                                                .overlay {
-                                                    Text(String(stock.symbol.prefix(1)))
-                                                        .font(.system(size: 16, weight: .semibold))
-                                                        .foregroundStyle(.blue)
-                                                }
-                                        @unknown default:
-                                            EmptyView()
-                                        }
-                                    }
-                                } else {
-                                    // Fallback when no image URL
-                                    Circle()
-                                        .fill(.blue.opacity(0.2))
-                                        .frame(width: 40, height: 40)
-                                        .overlay {
-                                            Text(String(stock.symbol.prefix(1)))
-                                                .font(.system(size: 16, weight: .semibold))
-                                                .foregroundStyle(.blue)
-                                        }
-                                }
+                                StockLogoImage(imageUrl: stock.image, symbol: stock.symbol, size: 40)
 
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(stock.symbol)

@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xcodebuild:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nAdd authentication system with Firebase and API integration\n\nImplements Firebase-based authentication with Google Sign-In and Apple Sign-In support. Uses proper client-server architecture where all business logic \\(subscription tiers, usage limits, feature access\\) is enforced server-side via investor-api-service API.\n\nNew Files:\n- UserPrivilege.swift: User model with privilege levels \\(Admin, Free, Pro, Max, Ultimate\\)\n- AuthenticationService.swift: Firebase Auth integration for Google/Apple OAuth\n- KeychainManager.swift: Secure token storage using iOS Keychain\n- PrivilegeManager.swift: Authentication state management with API integration\n- SubscriptionService.swift: Subscription status handling \\(Adapty stub\\)\n- InvestorAPIService.swift: API client for backend communication\n- LoginView.swift: Login UI with OAuth buttons and glass effects\n\nModified Files:\n- ContentView.swift: Simplified to placeholder for future UI planning\n- AppTheme.swift: Added platform-specific backgrounds and glass effect components\n\nArchitecture:\n- Client handles auth UI, Firebase OAuth, and secure token storage\n- Server \\(investor-api-service\\) enforces business rules and access control\n- All feature access and usage tracking validated via API calls\n\nCo-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git push)",
+      "Bash(find:*)",
+      "WebSearch",
+      "WebFetch(domain:github.com)",
+      "Bash(git commit:*)",
+      "Bash(ls:*)",
+      "Bash(ruby -e:*)",
+      "Bash(git push:*)",
+      "Bash(xcrun simctl:*)",
+      "Bash(git reset:*)"
+    ]
+  }
+}

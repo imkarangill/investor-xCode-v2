@@ -60,6 +60,7 @@ struct StockProfile: Codable {
     let changes: Double?
     let changePercentage: Double?
     let mktCap: Int64?
+    let calculatedMktCap: Int64?
     let volume: Int64?
     let volAvg: Int64?
     let beta: Double?
@@ -72,7 +73,8 @@ struct StockProfile: Codable {
     let ceo: String?
     let description: String?
     let website: String?
-    let employees: Int?
+    let employees: String?
+    let image: String?
 }
 
 // MARK: - Score Breakdown
@@ -174,8 +176,26 @@ struct StockOverview: Codable, Identifiable {
     let dividends: [Dividend]
     let analystRatings: [String: Double]?
     let momentum: Momentum?
+    let prices: [String: PricePoint]?
+    let _metadata: APIMetadata?
 
     var id: String { symbol }
+}
+
+// MARK: - Price Point
+
+struct PricePoint: Codable {
+    let price: Double
+    let date: String
+}
+
+// MARK: - API Metadata
+
+struct APIMetadata: Codable {
+    let calculationsPerformed: Int?
+    let cacheEnabled: Bool?
+    let cacheTTL: Int?
+    let maxScore: Int?
 }
 
 // MARK: - API Error
