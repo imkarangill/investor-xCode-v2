@@ -90,7 +90,8 @@ struct LoginView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .visualEffect { content, _ in
-                    content.blur(radius: self.isLoading ? 0 : 10)
+                    let isLoading = self.isLoading
+                    return content.blur(radius: isLoading ? 0 : 10)
                 }
                 .transition(.opacity)
             }

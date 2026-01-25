@@ -153,40 +153,42 @@ final class AuthenticationService: NSObject, ObservableObject {
         let nonce = randomNonceString()
         currentNonce = nonce
 
-        return try await withCheckedThrowingContinuation { continuation in
-            let appleIDProvider = ASAuthorizationAppleIDProvider()
-            let request = appleIDProvider.createRequest()
-            request.requestedScopes = [.fullName, .email]
-            request.nonce = sha256(nonce)
+        return try await Task.detached(priority: .high) { [weak self] () -> AuthResult in
+            return try await withCheckedThrowingContinuation { continuation in
+                let appleIDProvider = ASAuthorizationAppleIDProvider()
+                let request = appleIDProvider.createRequest()
+                request.requestedScopes = [.fullName, .email]
+                request.nonce = self?.sha256(nonce) ?? ""
 
-            let authorizationController = ASAuthorizationController(authorizationRequests: [request])
+                let authorizationController = ASAuthorizationController(authorizationRequests: [request])
 
-            let delegate = AppleSignInDelegate { [weak self] result in
-                switch result {
-                case .success(let authResult):
-                    continuation.resume(returning: authResult)
-                case .failure(let error):
-                    DispatchQueue.main.async { [weak self] in
-                        self?.errorMessage = "Apple Sign-In failed: \(error.localizedDescription)"
+                let delegate = AppleSignInDelegate { [weak self] result in
+                    switch result {
+                    case .success(let authResult):
+                        continuation.resume(returning: authResult)
+                    case .failure(let error):
+                        Task { @MainActor [weak self] in
+                            self?.errorMessage = "Apple Sign-In failed: \(error.localizedDescription)"
+                        }
+                        continuation.resume(throwing: error)
                     }
-                    continuation.resume(throwing: error)
                 }
+
+                authorizationController.delegate = delegate
+                authorizationController.presentationContextProvider = delegate
+
+                DispatchQueue.main.async {
+                    authorizationController.performRequests()
+                }
+
+                objc_setAssociatedObject(
+                    authorizationController,
+                    "delegate",
+                    delegate,
+                    .OBJC_ASSOCIATION_RETAIN
+                )
             }
-
-            authorizationController.delegate = delegate
-            authorizationController.presentationContextProvider = delegate
-
-            DispatchQueue.main.async {
-                authorizationController.performRequests()
-            }
-
-            objc_setAssociatedObject(
-                authorizationController,
-                "delegate",
-                delegate,
-                .OBJC_ASSOCIATION_RETAIN
-            )
-        }
+        }.value
     }
 
     /// Handle Apple Sign-In credential
@@ -350,7 +352,7 @@ private class AppleSignInDelegate: NSObject, ASAuthorizationControllerDelegate, 
     }
 
     func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
-        Task {
+        Task.detached { [weak self] in
             do {
                 guard let nonce = await AuthenticationService.shared.currentNonce else {
                     throw AuthError.missingNonce
@@ -360,9 +362,9 @@ private class AppleSignInDelegate: NSObject, ASAuthorizationControllerDelegate, 
                     authorization,
                     nonce: nonce
                 )
-                completion(.success(result))
+                self?.completion(.success(result))
             } catch {
-                completion(.failure(error))
+                self?.completion(.failure(error))
             }
         }
     }
