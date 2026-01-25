@@ -11,13 +11,20 @@ import SwiftData
 @main
 struct InvestorApp: App {
     @StateObject private var stockListService = StockListService.shared
+    @StateObject private var privilegeManager = PrivilegeManager.shared
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .task {
-                    await stockListService.initialize()
-                }
+            if privilegeManager.isAuthenticated {
+                ContentView()
+                    .task {
+                        await stockListService.initialize()
+                    }
+                    .transition(.opacity)
+            } else {
+                LoginView(privilegeManager: privilegeManager)
+                    .transition(.opacity)
+            }
         }
         .modelContainer(for: []) // Add SwiftData models here when needed
 
