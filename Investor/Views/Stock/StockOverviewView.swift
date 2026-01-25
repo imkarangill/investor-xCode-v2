@@ -40,6 +40,8 @@ struct StockOverviewView: View {
                     StockHeader(overview: overview)
                 }
             }
+            .frame(maxWidth: .infinity, alignment: .topLeading)
+            .padding()
         }
         .task(id: symbol) {
             await service.fetchOverview(for: symbol)

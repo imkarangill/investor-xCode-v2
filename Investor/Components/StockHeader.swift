@@ -16,75 +16,73 @@ struct StockHeader: View {
             HStack(alignment: .top, spacing: 12) {
                 StockLogoImage(imageUrl: overview.profile.image, symbol: overview.symbol, size: 50)
 
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: 2) {
                     if let companyName = overview.profile.companyName {
                         Text(companyName)
-                            .font(.subheadline)
-                            .fontWeight(.bold)
+                            .font(.headline)
+                            .fontWeight(.semibold)
                     }
                     Text(overview.symbol)
-                        .font(.subheadline)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
                 Spacer()
                 if let price = overview.profile.price {
                     Text(StockService.formatPrice(price, currency: overview.profile.currency))
-                        .font(.title)
+                        .font(.title2)
+                        .fontWeight(.bold)
                 }
             }
 
-            // Price Information
+            // Company Details - Two Column Layout
             VStack(alignment: .leading, spacing: 8) {
-                if let changes = overview.profile.changes,
-                   let changePercentage = overview.profile.changePercentage {
-                    HStack(spacing: 8) {
-                        Text(String(format: "%.2f", changes))
-                            .foregroundStyle(changes >= 0 ? .green : .red)
-
-                        Text(String(format: "(%.2f%%)", changePercentage))
-                            .foregroundStyle(changePercentage >= 0 ? .green : .red)
+                HStack(spacing: 16) {
+                    // Left column
+                    VStack(alignment: .leading, spacing: 8) {
+                        if let sector = overview.profile.sector {
+                            DetailItem(label: "Sector", value: sector)
+                        }
+                        if let industry = overview.profile.industry {
+                            DetailItem(label: "Industry", value: industry)
+                        }
                     }
-                    .font(.subheadline)
-                }
-            }
 
-            // Company Details
-            VStack(alignment: .leading, spacing: 12) {
-                DetailRow(label: "Exchange", value: overview.profile.exchange ?? "—")
-                DetailRow(label: "Industry", value: overview.profile.industry ?? "—")
-                DetailRow(label: "Sector", value: overview.profile.sector ?? "—")
+                    Spacer()
 
-                if let mktCap = overview.profile.calculatedMktCap ?? overview.profile.mktCap {
-                    DetailRow(label: "Market Cap", value: StockService.formatMarketCap(mktCap))
+                    // Right column
+                    VStack(alignment: .leading, spacing: 8) {
+                        if let employees = overview.profile.employees {
+                            DetailItem(label: "Employees", value: employees)
+                        }
+                        DetailItem(label: "Market Cap", value: StockService.formatMarketCap(overview.profile.calculatedMktCap))
+                    }
                 }
 
-                if let employees = overview.profile.employees {
-                    DetailRow(label: "Employees", value: employees)
+                if let website = overview.profile.website {
+                    DetailItem(label: "Website", value: website)
                 }
             }
         }
-        .padding(16)
-        .background(.white)
-        .cornerRadius(12)
+        .frame(maxWidth: .infinity, alignment: .topLeading)
+        .padding()
+        .glassEffect(.regular.interactive(), in: .containerRelative)
     }
 }
 
 // MARK: - Helper Components
 
-struct DetailRow: View {
+struct DetailItem: View {
     let label: String
     let value: String
 
     var body: some View {
-        HStack {
+        VStack(alignment: .leading, spacing: 2) {
             Text(label)
-                .font(.subheadline)
+                .font(.caption)
                 .foregroundStyle(.secondary)
 
-            Spacer()
-
             Text(value)
-                .font(.subheadline)
-                .fontWeight(.semibold)
+                .font(.callout)
         }
     }
 }
