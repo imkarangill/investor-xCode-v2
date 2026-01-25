@@ -162,20 +162,23 @@ final class AuthenticationService: NSObject, ObservableObject {
             let authorizationController = ASAuthorizationController(authorizationRequests: [request])
 
             let delegate = AppleSignInDelegate { [weak self] result in
-                Task { @MainActor in
-                    switch result {
-                    case .success(let authResult):
-                        continuation.resume(returning: authResult)
-                    case .failure(let error):
+                switch result {
+                case .success(let authResult):
+                    continuation.resume(returning: authResult)
+                case .failure(let error):
+                    DispatchQueue.main.async { [weak self] in
                         self?.errorMessage = "Apple Sign-In failed: \(error.localizedDescription)"
-                        continuation.resume(throwing: error)
                     }
+                    continuation.resume(throwing: error)
                 }
             }
 
             authorizationController.delegate = delegate
             authorizationController.presentationContextProvider = delegate
-            authorizationController.performRequests()
+
+            DispatchQueue.main.async {
+                authorizationController.performRequests()
+            }
 
             objc_setAssociatedObject(
                 authorizationController,
