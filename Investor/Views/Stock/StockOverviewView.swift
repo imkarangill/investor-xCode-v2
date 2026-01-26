@@ -12,42 +12,51 @@ struct StockOverviewView: View {
     let symbol: String
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                if service.isLoading {
-                    VStack(spacing: 16) {
-                        ProgressView()
-                        Text("Loading \(symbol)...")
-                            .font(.headline)
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .padding(.top, 100)
-                } else if let error = service.error {
-                    VStack(spacing: 16) {
-                        Image(systemName: "exclamationmark.triangle")
-                            .font(.system(size: 50))
-                            .foregroundStyle(.red)
-                        Text("Error")
-                            .font(.headline)
-                        Text(error.localizedDescription)
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                            .multilineTextAlignment(.center)
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .padding(.top, 100)
-                } else if let overview = service.stockOverview {
-                    VStack() {
-                        StockHeader(overview: overview)
+        ZStack(alignment: .top) {
+            if service.isLoading {
+                VStack(spacing: 16) {
+                    ProgressView()
+                    Text("Loading \(symbol)...")
+                        .font(.headline)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .padding(.top, 100)
+            } else if let error = service.error {
+                VStack(spacing: 16) {
+                    Image(systemName: "exclamationmark.triangle")
+                        .font(.system(size: 50))
+                        .foregroundStyle(.red)
+                    Text("Error")
+                        .font(.headline)
+                    Text(error.localizedDescription)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .padding(.top, 100)
+            } else if let overview = service.stockOverview {
+                ScrollView {
+                    VStack(spacing: 20) {
+                        Spacer()
+                            .frame(height: 106)
+
                         GrowthTileContent(overview: overview)
                         RatiosTileContent(overview: overview)
                         ReturnsTileContent(overview: overview)
                         ValuationTileContent(overview: overview)
                     }
+                    .frame(maxWidth: .infinity, alignment: .topLeading)
+                    .padding(.horizontal)
+                    .padding(.bottom)
                 }
+
+                VStack(spacing: 0) {
+                    StockHeader(overview: overview)
+                    Spacer()
+                }
+                .ignoresSafeArea(edges: .bottom)
             }
-            .frame(maxWidth: .infinity, alignment: .topLeading)
-            .padding()
         }
         .task(id: symbol) {
             await service.fetchOverview(for: symbol)
