@@ -27,8 +27,13 @@ struct StockTabs: View {
                         .font(.caption)
                         .foregroundStyle(selectedTab == tab ? .blue : .secondary)
                         .bold(selectedTab == tab)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
                 }
                 .buttonStyle(.plain)
+                .glassEffect(.regular.interactive(), in: .capsule)
+//                .frame(maxWidth: .infinity, maxHeight: 10, alignment: .topLeading)
+//                .padding()
 
                 if tab != StockTab.allCases.last {
                     Divider().bold()
@@ -37,7 +42,7 @@ struct StockTabs: View {
         }
         .frame(maxWidth: .infinity, maxHeight: 10, alignment: .topLeading)
         .padding()
-        .glassEffect(.regular.interactive(), in: .capsule)
+//        .glassEffect(.regular.interactive(), in: .capsule)
     }
 }
 
