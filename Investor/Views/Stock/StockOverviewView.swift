@@ -39,7 +39,7 @@ struct StockOverviewView: View {
                 ScrollView {
                     VStack(spacing: 20) {
                         Spacer()
-                            .frame(height: 106)
+                            .frame(height: 140)
 
                         GrowthTileContent(overview: overview)
                         RatiosTileContent(overview: overview)
@@ -53,14 +53,17 @@ struct StockOverviewView: View {
 
                 VStack(spacing: 0) {
                     StockHeader(overview: overview)
-                    Spacer()
+                        .padding(.bottom)
+                    StockTabs().padding(.bottom)
                 }
+//                .padding(.bottom,  20)
                 .ignoresSafeArea(edges: .bottom)
             }
         }
         .task(id: symbol) {
             await service.fetchOverview(for: symbol)
         }
+        .padding()
     }
 }
 
