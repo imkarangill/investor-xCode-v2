@@ -67,6 +67,7 @@ actor APIClient {
         request.httpMethod = "GET"
         request.setValue("Bearer \(userKey)", forHTTPHeaderField: "Authorization")
         request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.setValue("Mozilla/5.0 (iPhone; CPU iPhone OS 17_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.2 Mobile/15E148 Safari/604.1", forHTTPHeaderField: "User-Agent")
 
         let (data, response) = try await session.data(for: request)
 
