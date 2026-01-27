@@ -16,6 +16,7 @@ final class KeychainManager {
     private let authTokenKey = "com.investor.authToken"
     private let userIDKey = "com.investor.userID"
     private let userEmailKey = "com.investor.userEmail"
+    private let adminKeyKey = "com.investor.adminKey"
     private let serviceName = "com.investor.auth"
 
     private init() {}
@@ -56,12 +57,25 @@ final class KeychainManager {
         return String(data: data, encoding: .utf8)
     }
 
+    // MARK: - Admin Key
+
+    func saveAdminKey(_ key: String) throws {
+        let data = key.data(using: .utf8) ?? Data()
+        try saveKeychain(key: adminKeyKey, data: data)
+    }
+
+    func getAdminKey() -> String? {
+        guard let data = try? loadKeychain(key: adminKeyKey) else { return nil }
+        return String(data: data, encoding: .utf8)
+    }
+
     // MARK: - Clear All
 
     func clearAll() {
         try? deleteKeychain(key: authTokenKey)
         try? deleteKeychain(key: userIDKey)
         try? deleteKeychain(key: userEmailKey)
+        try? deleteKeychain(key: adminKeyKey)
     }
 
     // MARK: - Private Helpers

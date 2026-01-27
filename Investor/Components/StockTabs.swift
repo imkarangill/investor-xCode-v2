@@ -16,28 +16,32 @@ struct StockTabs: View {
     @State private var selectedTab: StockTab = .overview
 
     var body: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(alignment: .top, spacing: 12) {
-                ForEach(StockTab.allCases, id: \.self) { tab in
-                    Button {
-                        withAnimation(AppTheme.Animation.quick) {
-                            selectedTab = tab
+        VStack(spacing: 12) {
+            // Tab buttons with horizontal scroll
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(alignment: .top, spacing: 12) {
+                    ForEach(StockTab.allCases, id: \.self) { tab in
+                        Button {
+                            withAnimation(AppTheme.Animation.quick) {
+                                selectedTab = tab
+                            }
+                        } label: {
+                            Text(tab.rawValue)
+                                .font(.caption)
+                                .foregroundStyle(selectedTab == tab ? .blue : .secondary)
+                                .bold(selectedTab == tab)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 8)
                         }
-                    } label: {
-                        Text(tab.rawValue)
-                            .font(.caption)
-                            .foregroundStyle(selectedTab == tab ? .blue : .secondary)
-                            .bold(selectedTab == tab)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 8)
+                        .buttonStyle(.automatic)
+                        .glassEffect(.regular.interactive(), in: .capsule)
                     }
-                    .buttonStyle(.plain)
-                    .glassEffect(.regular.interactive(), in: .capsule)
                 }
+                .padding(.horizontal)
+                .padding(.vertical, 20)
             }
-            .padding(.horizontal)
+            .scrollContentBackground(.hidden)
         }
-        .padding(.vertical)
     }
 }
 

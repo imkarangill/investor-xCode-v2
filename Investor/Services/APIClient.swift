@@ -18,7 +18,6 @@ actor APIClient {
     // Note: In production, this should be stored securely (e.g., Keychain)
     // For development, you can set this via environment variable or config file
     private var userKey: String {
-        // Try to get from environment or use placeholder
         ProcessInfo.processInfo.environment["INVESTOR_ADMIN_KEY"] ?? ""
     }
 

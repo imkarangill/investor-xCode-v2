@@ -171,7 +171,7 @@ struct StockOverview: Codable, Identifiable, Sendable {
     let growth: GrowthMetrics
     let returns: ReturnsMetrics
     let ratios: Ratios
-    let valuation: [String: Double]?
+    let valuation: [String: [String: Double?]]?
     let earnings: [Earnings]
     let dividends: [Dividend]
     let analystRatings: [String: Double]?

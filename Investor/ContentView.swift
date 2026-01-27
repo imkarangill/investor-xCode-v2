@@ -42,7 +42,6 @@ struct ContentView: View {
                         } label: {
                             Image(systemName: "house.fill")
                                 .font(.title)
-                                .foregroundStyle(.blue)
                                 .frame(width: 50, height: 50)
                         }
                         .buttonStyle(.plain)
@@ -57,7 +56,6 @@ struct ContentView: View {
                             } label: {
                                 Image(systemName: "house.fill")
                                     .font(.title)
-                                    .foregroundStyle(currentView == "home" ? .blue : .primary)
                             }
                             .buttonStyle(.plain)
 
@@ -66,7 +64,6 @@ struct ContentView: View {
                             } label: {
                                 Image(systemName: "gearshape.fill")
                                     .font(.title)
-                                    .foregroundStyle(currentView == "settings" ? .blue : .primary)
                             }
                             .buttonStyle(.plain)
                         }

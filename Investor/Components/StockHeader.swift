@@ -33,35 +33,6 @@ struct StockHeader: View {
                         .fontWeight(.bold)
                 }
             }
-
-//            // Company Details - Two Column Layout
-//            VStack(alignment: .leading, spacing: 8) {
-//                HStack(spacing: 16) {
-//                    // Left column
-//                    VStack(alignment: .leading, spacing: 8) {
-//                        if let sector = overview.profile.sector {
-//                            DetailItem(label: "Sector", value: sector)
-//                        }
-//                        if let industry = overview.profile.industry {
-//                            DetailItem(label: "Industry", value: industry)
-//                        }
-//                    }
-//
-//                    Spacer()
-//
-//                    // Right column
-//                    VStack(alignment: .leading, spacing: 8) {
-//                        if let employees = overview.profile.employees {
-//                            DetailItem(label: "Employees", value: employees)
-//                        }
-//                        DetailItem(label: "Market Cap", value: StockService.formatMarketCap(overview.profile.calculatedMktCap))
-//                    }
-//                }
-//
-//                if let website = overview.profile.website {
-//                    DetailItem(label: "Website", value: website)
-//                }
-//            }
         }
         .frame(maxWidth: .infinity, alignment: .topLeading)
         .padding()

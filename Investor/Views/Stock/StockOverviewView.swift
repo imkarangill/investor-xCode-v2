@@ -53,7 +53,7 @@ struct StockOverviewView: View {
 
                 VStack(spacing: 0) {
                     StockHeader(overview: overview)
-                        .padding(.bottom)
+                        //.padding(.bottom)
                     StockTabs().padding(.bottom)
                 }
 //                .padding(.bottom,  20)

@@ -23,7 +23,7 @@ struct ValuationTileContent: View {
 
                 // Display valuation metrics
                 ForEach(Array(valuation.sorted { $0.key < $1.key }.enumerated()), id: \.element.key) { index, item in
-                    ValuationMetricRow(label: item.key, value: item.value)
+//                    ValuationMetricRow(label: item.key, value: item.value)
 
                     if index < valuation.count - 1 {
                         Divider()
@@ -134,10 +134,10 @@ struct ValuationMetricRow: View {
                 quickRatio: PeriodMetrics(fiveYear: 1.0, threeYear: 0.0, twoYear: 0.0, oneYear: 0.0, sixMonth: 0.0)
             ),
             valuation: [
-                "peRatio": 28.45,
-                "pbRatio": 42.3,
-                "pegRatio": 2.1,
-                "psRatio": 7.8
+                "peRatio": ["f":8.45],
+                "pbRatio": ["f":8.45],
+                "pegRatio": ["f":8.45],
+                "psRatio": ["f":8.45]
             ],
             earnings: [],
             dividends: [],
