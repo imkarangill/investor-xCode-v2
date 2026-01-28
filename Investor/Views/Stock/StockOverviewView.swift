@@ -11,6 +11,28 @@ struct StockOverviewView: View {
     @ObservedObject var service: StockService
     let symbol: String
 
+    // MARK: - Computed Properties
+
+    var subscriptionWarning: String? {
+        guard service.viewsRemaining > 0 || service.viewsRemaining == 0 else { return nil }
+
+        switch service.subscriptionTier {
+        case "free":
+            if service.viewsRemaining == 0 {
+                return "You've reached your limit of \(service.viewsLimit) stocks. Upgrade to unlock more."
+            } else if service.viewsRemaining == 1 {
+                return "Only \(service.viewsRemaining) stock remaining. Upgrade to unlock more."
+            }
+        case "pro":
+            if service.viewsRemaining <= 10 && service.viewsRemaining > 0 {
+                return "\(service.viewsRemaining) stocks remaining this month"
+            }
+        default:
+            break
+        }
+        return nil
+    }
+
     var body: some View {
         ZStack(alignment: .top) {
             if service.isLoading {
@@ -41,6 +63,11 @@ struct StockOverviewView: View {
                         Spacer()
                             .frame(height: 140)
 
+                        // Show subscription limit warning if applicable
+                        if let warningMessage = subscriptionWarning {
+                            subscriptionWarningBanner(message: warningMessage)
+                        }
+
                         GrowthTileContent(overview: overview)
                         RatiosTileContent(overview: overview)
                         ReturnsTileContent(overview: overview)
@@ -64,6 +91,36 @@ struct StockOverviewView: View {
             await service.fetchOverview(for: symbol)
         }
         .padding()
+    }
+
+    // MARK: - Helper Views
+
+    @ViewBuilder
+    func subscriptionWarningBanner(message: String) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: "exclamationmark.circle.fill")
+                .font(.system(size: 18))
+                .foregroundStyle(.orange)
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Subscription Limit")
+                    .font(.headline)
+                    .foregroundStyle(.primary)
+
+                Text(message)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+
+            Spacer()
+        }
+        .padding(12)
+        .background(Color.orange.opacity(0.1))
+        .cornerRadius(8)
+        .overlay(
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(Color.orange.opacity(0.3), lineWidth: 1)
+        )
     }
 }
 

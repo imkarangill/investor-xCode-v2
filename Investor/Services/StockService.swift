@@ -18,6 +18,13 @@ class StockService: ObservableObject {
     @Published var error: Error?
     @Published var lastUpdated: Date?
 
+    // MARK: - Subscription Limits (from API response metadata)
+
+    @Published var viewsUsed: Int = 0
+    @Published var viewsLimit: Int = 0
+    @Published var viewsRemaining: Int = 0
+    @Published var subscriptionTier: String = "free"
+
     // MARK: - Private
 
     private let apiClient = APIClient.shared
@@ -35,14 +42,53 @@ class StockService: ObservableObject {
 
         do {
             let overview = try await apiClient.fetchStockOverview(symbol: symbol)
+
+            // Extract and store subscription limit information from metadata
+            if let viewStats = overview._metadata?.viewStats {
+                self.viewsUsed = viewStats.viewsUsed
+                self.viewsLimit = viewStats.viewsLimit
+                self.viewsRemaining = viewStats.viewsRemaining
+                self.subscriptionTier = viewStats.tier
+            }
+
             stockOverview = overview
             loadedSymbol = symbol
             lastUpdated = Date()
+        } catch let error as APIClientError {
+            self.error = handleStockError(error)
         } catch {
             self.error = error
         }
 
         isLoading = false
+    }
+
+    /// Handle API client errors and provide user-friendly messages
+    private func handleStockError(_ error: APIClientError) -> Error {
+        switch error {
+        case .forbidden(let message):
+            // Subscription limit exceeded
+            return NSError(
+                domain: "StockService",
+                code: 403,
+                userInfo: [
+                    NSLocalizedDescriptionKey: message.isEmpty
+                        ? "You've reached your limit of \(viewsLimit) stocks for \(subscriptionTier) tier"
+                        : message
+                ]
+            )
+
+        case .badRequest(let message):
+            // Subscription lookup failed
+            return NSError(
+                domain: "StockService",
+                code: 400,
+                userInfo: [NSLocalizedDescriptionKey: "Subscription error: \(message)"]
+            )
+
+        default:
+            return error
+        }
     }
 
     /// Force refresh the current stock
@@ -57,6 +103,10 @@ class StockService: ObservableObject {
         stockOverview = nil
         loadedSymbol = nil
         error = nil
+        viewsUsed = 0
+        viewsLimit = 0
+        viewsRemaining = 0
+        subscriptionTier = "free"
     }
 }
 

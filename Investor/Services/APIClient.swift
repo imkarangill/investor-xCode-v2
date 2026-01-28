@@ -15,10 +15,9 @@ actor APIClient {
     private let baseURL = "https://investor-api-service-production.up.railway.app"
     private let apiVersion = "v1"
 
-    // Note: In production, this should be stored securely (e.g., Keychain)
-    // For development, you can set this via environment variable or config file
-    private var userKey: String {
-        ProcessInfo.processInfo.environment["INVESTOR_ADMIN_KEY"] ?? ""
+    // Get Firebase ID token from Keychain for authentication
+    private var authToken: String? {
+        KeychainManager.shared.getAuthToken()
     }
 
     private let session: URLSession
@@ -63,9 +62,13 @@ actor APIClient {
             throw APIClientError.invalidURL
         }
 
+        guard let token = authToken else {
+            throw APIClientError.unauthorized(message: "No authentication token found. Please sign in.")
+        }
+
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
-        request.setValue("Bearer \(userKey)", forHTTPHeaderField: "Authorization")
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         request.setValue("Mozilla/5.0 (iPhone; CPU iPhone OS 17_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.2 Mobile/15E148 Safari/604.1", forHTTPHeaderField: "User-Agent")
 
@@ -83,11 +86,16 @@ actor APIClient {
                 throw APIClientError.decodingError(error)
             }
 
+        case 400:
+            let errorMessage = extractErrorMessage(from: data) ?? "Invalid request"
+            throw APIClientError.badRequest(message: errorMessage)
+
         case 401:
-            throw APIClientError.unauthorized
+            throw APIClientError.unauthorized(message: "Authentication failed. Please sign in again.")
 
         case 403:
-            throw APIClientError.forbidden
+            let errorMessage = extractErrorMessage(from: data) ?? "Access forbidden"
+            throw APIClientError.forbidden(message: errorMessage)
 
         case 404:
             throw APIClientError.notFound
@@ -99,6 +107,21 @@ actor APIClient {
             throw APIClientError.httpError(httpResponse.statusCode)
         }
     }
+
+    private func extractErrorMessage(from data: Data) -> String? {
+        do {
+            if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+               let detail = json["detail"] as? String {
+                return detail
+            }
+        } catch {
+            // Fall back to trying APIError struct
+            if let error = try? decoder.decode(APIError.self, from: data) {
+                return error.error
+            }
+        }
+        return nil
+    }
 }
 
 // MARK: - API Client Error
@@ -106,8 +129,9 @@ actor APIClient {
 enum APIClientError: LocalizedError {
     case invalidURL
     case invalidResponse
-    case unauthorized
-    case forbidden
+    case badRequest(message: String)
+    case unauthorized(message: String)
+    case forbidden(message: String)
     case notFound
     case serverError(Int)
     case httpError(Int)
@@ -119,10 +143,12 @@ enum APIClientError: LocalizedError {
             return "Invalid URL"
         case .invalidResponse:
             return "Invalid response from server"
-        case .unauthorized:
-            return "Unauthorized. Please check your API key."
-        case .forbidden:
-            return "Access forbidden. You may have reached the rate limit or don't have permission for this resource."
+        case .badRequest(let message):
+            return "Bad request: \(message)"
+        case .unauthorized(let message):
+            return message
+        case .forbidden(let message):
+            return message
         case .notFound:
             return "Stock not found"
         case .serverError(let code):

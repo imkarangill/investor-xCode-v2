@@ -32,6 +32,33 @@ struct PeriodMetrics: Codable, Equatable, Sendable {
     static let periodLabels = ["5y", "3y", "2y", "1y", "6m"]
 }
 
+// MARK: - Valuation Period Metrics
+
+struct ValuationPeriodMetrics: Codable, Equatable, Sendable {
+    let today: Double?
+    let sixMonth: Double?
+    let oneYear: Double?
+    let twoYear: Double?
+    let threeYear: Double?
+    let fiveYear: Double?
+
+    enum CodingKeys: String, CodingKey {
+        case today
+        case sixMonth = "6m"
+        case oneYear = "1y"
+        case twoYear = "2y"
+        case threeYear = "3y"
+        case fiveYear = "5y"
+    }
+
+    /// Returns an array of values in order: [3y, 2y, 1y, 6m, today]
+    var allValues: [Double?] {
+        [threeYear, twoYear, oneYear, sixMonth, today]
+    }
+
+    static let periodLabels = ["3y", "2y", "1y", "6m", "Today"]
+}
+
 // MARK: - Stock List Item
 
 struct StockListItem: Codable, Identifiable, Equatable, Sendable {
@@ -127,6 +154,17 @@ struct Ratios: Codable, Sendable {
     let quickRatio: PeriodMetrics
 }
 
+// MARK: - Valuation Metrics
+
+struct ValuationMetrics: Codable, Sendable {
+    let peRatio: ValuationPeriodMetrics
+    let pbRatio: ValuationPeriodMetrics
+    let pegRatio: ValuationPeriodMetrics
+    let marketCapToFcf: ValuationPeriodMetrics
+    let evToEarnings: ValuationPeriodMetrics
+    let marketCapToBookValue: ValuationPeriodMetrics
+}
+
 // MARK: - Momentum
 
 struct Momentum: Codable, Sendable {
@@ -171,7 +209,7 @@ struct StockOverview: Codable, Identifiable, Sendable {
     let growth: GrowthMetrics
     let returns: ReturnsMetrics
     let ratios: Ratios
-    let valuation: [String: [String: Double?]]?
+    let valuation: ValuationMetrics?
     let earnings: [Earnings]
     let dividends: [Dividend]
     let analystRatings: [String: Double]?
@@ -189,6 +227,22 @@ struct PricePoint: Codable, Sendable {
     let date: String
 }
 
+// MARK: - View Statistics
+
+struct ViewStats: Codable, Sendable {
+    let viewsUsed: Int
+    let viewsLimit: Int
+    let viewsRemaining: Int
+    let tier: String  // "free", "pro", "max"
+
+    enum CodingKeys: String, CodingKey {
+        case viewsUsed
+        case viewsLimit
+        case viewsRemaining
+        case tier
+    }
+}
+
 // MARK: - API Metadata
 
 struct APIMetadata: Codable, Sendable {
@@ -196,6 +250,15 @@ struct APIMetadata: Codable, Sendable {
     let cacheEnabled: Bool?
     let cacheTTL: Int?
     let maxScore: Int?
+    let viewStats: ViewStats?
+
+    enum CodingKeys: String, CodingKey {
+        case calculationsPerformed
+        case cacheEnabled
+        case cacheTTL
+        case maxScore
+        case viewStats
+    }
 }
 
 // MARK: - API Error
