@@ -122,12 +122,9 @@ final class AuthenticationService: NSObject, ObservableObject {
 
             // Save Firebase ID token to Keychain
             do {
-                if let firebaseToken = try await authResult.user.getIDToken() {
-                    try keychainManager.saveAuthToken(firebaseToken)
-                    print("✅ [Auth] Firebase token saved to Keychain")
-                } else {
-                    print("⚠️ [Auth] Failed to get Firebase token - returned nil")
-                }
+                let firebaseToken = try await authResult.user.getIDToken()
+                try keychainManager.saveAuthToken(firebaseToken)
+                print("✅ [Auth] Firebase token saved to Keychain")
             } catch {
                 print("❌ [Auth] Failed to save Firebase token: \(error.localizedDescription)")
                 throw error
@@ -224,12 +221,9 @@ final class AuthenticationService: NSObject, ObservableObject {
 
         // Save Firebase ID token to Keychain
         do {
-            if let firebaseToken = try await authResult.user.getIDToken() {
-                try keychainManager.saveAuthToken(firebaseToken)
-                print("✅ [Auth] Firebase token saved to Keychain")
-            } else {
-                print("⚠️ [Auth] Failed to get Firebase token - returned nil")
-            }
+            let firebaseToken = try await authResult.user.getIDToken()
+            try keychainManager.saveAuthToken(firebaseToken)
+            print("✅ [Auth] Firebase token saved to Keychain")
         } catch {
             print("❌ [Auth] Failed to save Firebase token: \(error.localizedDescription)")
             throw error
