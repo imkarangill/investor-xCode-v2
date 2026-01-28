@@ -9,7 +9,7 @@ import Foundation
 import Security
 
 /// Manages secure storage of authentication tokens and user data in Keychain
-@MainActor
+/// Thread-safe class for accessing Keychain (no @MainActor needed - Keychain is thread-safe)
 final class KeychainManager {
     static let shared = KeychainManager()
 
