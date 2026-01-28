@@ -6,9 +6,11 @@
 //
 
 import Foundation
+import os
 
 actor APIClient {
     static let shared = APIClient()
+    private static let logger = os.Logger(subsystem: "com.investor", category: "APIClient")
 
     // MARK: - Configuration
 
@@ -63,8 +65,13 @@ actor APIClient {
         }
 
         guard let token = authToken else {
-            throw APIClientError.unauthorized(message: "No authentication token found. Please sign in.")
+            let errorMsg = "No authentication token found. Please sign in."
+            Self.logger.error("Auth token missing - Keychain may not have token. \(errorMsg)")
+            throw APIClientError.unauthorized(message: errorMsg)
         }
+
+        let tokenPreview = String(token.prefix(20)) + "..."
+        Self.logger.debug("Making request to \(endpoint) with token: \(tokenPreview)")
 
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
@@ -91,7 +98,9 @@ actor APIClient {
             throw APIClientError.badRequest(message: errorMessage)
 
         case 401:
-            throw APIClientError.unauthorized(message: "Authentication failed. Please sign in again.")
+            let errorMsg = extractErrorMessage(from: data) ?? "Authentication failed. Please sign in again."
+            Self.logger.error("API returned 401 Unauthorized: \(errorMsg)")
+            throw APIClientError.unauthorized(message: errorMsg)
 
         case 403:
             let errorMessage = extractErrorMessage(from: data) ?? "Access forbidden"

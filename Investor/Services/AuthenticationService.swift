@@ -120,13 +120,25 @@ final class AuthenticationService: NSObject, ObservableObject {
 
             let authResult = try await Auth.auth().signIn(with: credential)
 
-            if let firebaseToken = try? await authResult.user.getIDToken() {
-                try? keychainManager.saveAuthToken(firebaseToken)
+            // Save Firebase ID token to Keychain
+            do {
+                if let firebaseToken = try await authResult.user.getIDToken() {
+                    try keychainManager.saveAuthToken(firebaseToken)
+                    print("✅ [Auth] Firebase token saved to Keychain")
+                } else {
+                    print("⚠️ [Auth] Failed to get Firebase token - returned nil")
+                }
+            } catch {
+                print("❌ [Auth] Failed to save Firebase token: \(error.localizedDescription)")
+                throw error
             }
 
-            try? keychainManager.saveUserID(authResult.user.uid)
+            try keychainManager.saveUserID(authResult.user.uid)
+            print("✅ [Auth] User ID saved: \(authResult.user.uid)")
+
             if let email = authResult.user.email {
-                try? keychainManager.saveUserEmail(email)
+                try keychainManager.saveUserEmail(email)
+                print("✅ [Auth] Email saved: \(email)")
             }
 
             let user = try await createUserFromFirebase(authResult.user)
@@ -210,14 +222,25 @@ final class AuthenticationService: NSObject, ObservableObject {
         let authResult = try await Auth.auth().signIn(with: credential)
         let email = authResult.user.email ?? appleIDCredential.email
 
-        if let firebaseToken = try? await authResult.user.getIDToken() {
-            try? keychainManager.saveAuthToken(firebaseToken)
+        // Save Firebase ID token to Keychain
+        do {
+            if let firebaseToken = try await authResult.user.getIDToken() {
+                try keychainManager.saveAuthToken(firebaseToken)
+                print("✅ [Auth] Firebase token saved to Keychain")
+            } else {
+                print("⚠️ [Auth] Failed to get Firebase token - returned nil")
+            }
+        } catch {
+            print("❌ [Auth] Failed to save Firebase token: \(error.localizedDescription)")
+            throw error
         }
 
-        try? keychainManager.saveUserID(authResult.user.uid)
+        try keychainManager.saveUserID(authResult.user.uid)
+        print("✅ [Auth] User ID saved: \(authResult.user.uid)")
+
         if let email = email {
-            try? keychainManager.saveUserEmail(email)
-            print("📧 [Auth] Captured email: \(email)")
+            try keychainManager.saveUserEmail(email)
+            print("✅ [Auth] Email saved: \(email)")
         }
 
         var user = try await createUserFromFirebase(authResult.user)
