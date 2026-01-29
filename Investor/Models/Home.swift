@@ -10,16 +10,10 @@ import Foundation
 // MARK: - Price Changes
 
 struct PriceChanges: Codable, Sendable {
-    let d1: String?      // 1-day change percentage
-    let w1: String?      // 1-week change percentage
-    let w2: String?      // 2-week change percentage
-    let m1: String?      // 1-month change percentage
-
-    /// Convert string percentage to Double
-    func asDouble(_ value: String?) -> Double? {
-        guard let value = value else { return nil }
-        return Double(value)
-    }
+    let d1: Double?      // 1-day change percentage
+    let w1: Double?      // 1-week change percentage
+    let w2: Double?      // 2-week change percentage
+    let m1: Double?      // 1-month change percentage
 }
 
 // MARK: - Portfolio Item
@@ -29,9 +23,10 @@ struct PortfolioItem: Codable, Identifiable, Sendable {
     let companyName: String
     let image: String?
     let currency: String
-    let quantity: String  // Decimal precision
-    let value: String     // Decimal precision
-    let price: String     // String for decimal precision
+    let quantity: String
+    let value: String
+    let price: String
+    let score: Int
     let priceChanges: PriceChanges
 
     var id: String { symbol }
@@ -44,6 +39,7 @@ struct PortfolioItem: Codable, Identifiable, Sendable {
         case quantity
         case value
         case price
+        case score
         case priceChanges = "price_changes"
     }
 }
@@ -54,7 +50,8 @@ struct WatchlistStock: Codable, Identifiable, Sendable {
     let symbol: String
     let companyName: String
     let image: String?
-    let price: String     // String for decimal precision
+    let price: String
+    let score: Int
     let priceChanges: PriceChanges
 
     var id: String { symbol }
@@ -64,6 +61,7 @@ struct WatchlistStock: Codable, Identifiable, Sendable {
         case companyName = "company_name"
         case image
         case price
+        case score
         case priceChanges = "price_changes"
     }
 }
@@ -92,7 +90,8 @@ struct RecentlyViewedItem: Codable, Identifiable, Sendable {
     let symbol: String
     let companyName: String
     let image: String?
-    let price: String    // String for decimal precision
+    let price: String
+    let score: Int
     let priceChanges: PriceChanges
 
     var id: String { symbol }
@@ -102,6 +101,7 @@ struct RecentlyViewedItem: Codable, Identifiable, Sendable {
         case companyName = "company_name"
         case image
         case price
+        case score
         case priceChanges = "price_changes"
     }
 }

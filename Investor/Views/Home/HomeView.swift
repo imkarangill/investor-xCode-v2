@@ -95,6 +95,8 @@ struct HomeView: View {
                 }
 
                 Spacer()
+
+                scoreBadge(item.score)
             }
 
             VStack(alignment: .leading, spacing: AppTheme.Spacing.xxs) {
@@ -204,7 +206,7 @@ struct HomeView: View {
                     .foregroundStyle(AppTheme.Colors.primaryText)
 
                 HStack(spacing: AppTheme.Spacing.xxs) {
-                    if let changeStr = stock.priceChanges.d1, let change = Double(changeStr) {
+                    if let change = stock.priceChanges.d1 {
                         let color = change >= 0 ? AppTheme.Colors.positive : AppTheme.Colors.negative
                         Text(formatPercentage(change))
                             .font(AppTheme.Typography.caption2)
@@ -215,9 +217,13 @@ struct HomeView: View {
 
             Spacer()
 
-            Text(formatPrice(stock.price))
-                .font(AppTheme.Typography.caption2)
-                .foregroundStyle(AppTheme.Colors.primaryText)
+            VStack(alignment: .trailing, spacing: AppTheme.Spacing.xxs) {
+                scoreBadge(stock.score, size: .small)
+
+                Text(formatPrice(stock.price))
+                    .font(AppTheme.Typography.caption2)
+                    .foregroundStyle(AppTheme.Colors.primaryText)
+            }
         }
     }
 
@@ -262,6 +268,8 @@ struct HomeView: View {
                 }
 
                 Spacer()
+
+                scoreBadge(item.score)
             }
 
             HStack {
@@ -272,7 +280,7 @@ struct HomeView: View {
 
                 Spacer()
 
-                if let changeStr = item.priceChanges.d1, let change = Double(changeStr) {
+                if let change = item.priceChanges.d1 {
                     let color = change >= 0 ? AppTheme.Colors.positive : AppTheme.Colors.negative
                     Text(formatPercentage(change))
                         .font(AppTheme.Typography.callout)
@@ -386,7 +394,7 @@ struct HomeView: View {
 
     // MARK: - Helpers
 
-    private func priceChangeRow(_ label: String, _ value: String?) -> some View {
+    private func priceChangeRow(_ label: String, _ value: Double?) -> some View {
         HStack {
             Text(label)
                 .font(AppTheme.Typography.caption2)
@@ -394,7 +402,7 @@ struct HomeView: View {
 
             Spacer()
 
-            if let valueStr = value, let doubleValue = Double(valueStr) {
+            if let doubleValue = value {
                 let color = doubleValue >= 0 ? AppTheme.Colors.positive : AppTheme.Colors.negative
                 Text(formatPercentage(doubleValue))
                     .font(AppTheme.Typography.caption2)
@@ -420,6 +428,44 @@ struct HomeView: View {
         formatter.minimumFractionDigits = 2
         formatter.maximumFractionDigits = 2
         return formatter.string(from: NSNumber(value: price)) ?? "—"
+    }
+
+    private func scoreBadge(_ score: Int, size: BadgeSize = .normal) -> some View {
+        let backgroundColor: Color
+        if score >= 70 {
+            backgroundColor = .green.opacity(0.2)
+        } else if score >= 50 {
+            backgroundColor = .orange.opacity(0.2)
+        } else {
+            backgroundColor = .red.opacity(0.2)
+        }
+
+        let textColor: Color
+        if score >= 70 {
+            textColor = .green
+        } else if score >= 50 {
+            textColor = .orange
+        } else {
+            textColor = .red
+        }
+
+        let (fontSize, padding) = size == .small ?
+            (AppTheme.Typography.caption2, AppTheme.Spacing.xs) :
+            (AppTheme.Typography.callout, AppTheme.Spacing.sm)
+
+        return Text("\(score)")
+            .font(fontSize)
+            .fontWeight(.semibold)
+            .foregroundStyle(textColor)
+            .padding(.horizontal, padding)
+            .padding(.vertical, AppTheme.Spacing.xxs)
+            .background(backgroundColor)
+            .clipShape(Capsule())
+    }
+
+    enum BadgeSize {
+        case small
+        case normal
     }
 }
 
