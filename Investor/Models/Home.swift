@@ -10,10 +10,10 @@ import Foundation
 // MARK: - Price Changes
 
 struct PriceChanges: Codable, Sendable {
-    let d1: Double?      // 1-day change percentage
-    let w1: Double?      // 1-week change percentage
-    let w2: Double?      // 2-week change percentage
-    let m1: Double?      // 1-month change percentage
+    let d1: String?      // 1-day change percentage
+    let w1: String?      // 1-week change percentage
+    let w2: String?      // 2-week change percentage
+    let m1: String?      // 1-month change percentage
 }
 
 // MARK: - Portfolio Item

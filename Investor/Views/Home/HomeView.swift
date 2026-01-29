@@ -206,7 +206,7 @@ struct HomeView: View {
                     .foregroundStyle(AppTheme.Colors.primaryText)
 
                 HStack(spacing: AppTheme.Spacing.xxs) {
-                    if let change = stock.priceChanges.d1 {
+                    if let changeStr = stock.priceChanges.d1, let change = Double(changeStr) {
                         let color = change >= 0 ? AppTheme.Colors.positive : AppTheme.Colors.negative
                         Text(formatPercentage(change))
                             .font(AppTheme.Typography.caption2)
@@ -280,7 +280,7 @@ struct HomeView: View {
 
                 Spacer()
 
-                if let change = item.priceChanges.d1 {
+                if let changeStr = item.priceChanges.d1, let change = Double(changeStr) {
                     let color = change >= 0 ? AppTheme.Colors.positive : AppTheme.Colors.negative
                     Text(formatPercentage(change))
                         .font(AppTheme.Typography.callout)
@@ -394,7 +394,7 @@ struct HomeView: View {
 
     // MARK: - Helpers
 
-    private func priceChangeRow(_ label: String, _ value: Double?) -> some View {
+    private func priceChangeRow(_ label: String, _ value: String?) -> some View {
         HStack {
             Text(label)
                 .font(AppTheme.Typography.caption2)
@@ -402,7 +402,7 @@ struct HomeView: View {
 
             Spacer()
 
-            if let doubleValue = value {
+            if let valueStr = value, let doubleValue = Double(valueStr) {
                 let color = doubleValue >= 0 ? AppTheme.Colors.positive : AppTheme.Colors.negative
                 Text(formatPercentage(doubleValue))
                     .font(AppTheme.Typography.caption2)
