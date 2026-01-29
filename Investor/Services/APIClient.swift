@@ -56,6 +56,12 @@ actor APIClient {
         return []
     }
 
+    /// Fetch home screen data (portfolio, watchlists, recently viewed)
+    func fetchHome() async throws -> HomeResponse {
+        let endpoint = "/api/\(apiVersion)/users/me/home"
+        return try await fetch(endpoint: endpoint)
+    }
+
     // MARK: - Private Methods
 
     /// Get fresh Firebase ID token, using cached token if still valid
@@ -108,6 +114,12 @@ actor APIClient {
             do {
                 return try decoder.decode(T.self, from: data)
             } catch {
+                // Log the raw response for debugging
+                if let jsonString = String(data: data, encoding: .utf8) {
+                    Self.logger.error("Decoding failed for endpoint: \(endpoint)")
+                    Self.logger.error("Response body: \(jsonString)")
+                }
+                Self.logger.error("Decoding error: \(error.localizedDescription)")
                 throw APIClientError.decodingError(error)
             }
 

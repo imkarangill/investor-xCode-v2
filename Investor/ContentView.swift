@@ -18,7 +18,7 @@ struct ContentView: View {
     var body: some View {
         ZStack(alignment: .bottom) {
             if currentView == "home" {
-                HomeView()
+                HomeView(currentView: $currentView, selectedStock: $selectedStock)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if currentView == "stock", let symbol = selectedStock {
                 StockOverviewView(service: stockService, symbol: symbol)
