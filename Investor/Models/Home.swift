@@ -90,6 +90,7 @@ struct RecentlyViewedItem: Codable, Identifiable, Sendable {
     let symbol: String
     let companyName: String
     let image: String?
+    let currency: String
     let price: String
     let score: Int
     let priceChanges: PriceChanges
@@ -100,6 +101,7 @@ struct RecentlyViewedItem: Codable, Identifiable, Sendable {
         case symbol
         case companyName = "company_name"
         case image
+        case currency
         case price
         case score
         case priceChanges = "price_changes"

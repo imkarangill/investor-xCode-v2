@@ -238,7 +238,7 @@ struct HomeView: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: AppTheme.Spacing.md) {
                         ForEach(recentlyViewed) { item in
-                            recentlyViewedCard(item)
+                            StockTileCard(item: item)
                                 .onTapGesture {
                                     selectedStock = item.symbol
                                     currentView = "stock"
@@ -249,48 +249,6 @@ struct HomeView: View {
                 }
             }
         }
-    }
-
-    private func recentlyViewedCard(_ item: RecentlyViewedItem) -> some View {
-        VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
-            HStack(spacing: AppTheme.Spacing.sm) {
-                StockLogoImage(imageUrl: item.image, symbol: item.symbol, size: 36)
-
-                VStack(alignment: .leading, spacing: AppTheme.Spacing.xxs) {
-                    Text(item.symbol)
-                        .font(AppTheme.Typography.caption2)
-                        .foregroundStyle(AppTheme.Colors.secondaryText)
-
-                    Text(item.companyName)
-                        .font(AppTheme.Typography.callout)
-                        .lineLimit(1)
-                        .foregroundStyle(AppTheme.Colors.primaryText)
-                }
-
-                Spacer()
-
-                scoreBadge(item.score)
-            }
-
-            HStack {
-                Text(formatPrice(item.price))
-                    .font(AppTheme.Typography.callout)
-                    .fontWeight(.semibold)
-                    .foregroundStyle(AppTheme.Colors.primaryText)
-
-                Spacer()
-
-                if let changeStr = item.priceChanges.d1, let change = Double(changeStr) {
-                    let color = change >= 0 ? AppTheme.Colors.positive : AppTheme.Colors.negative
-                    Text(formatPercentage(change))
-                        .font(AppTheme.Typography.callout)
-                        .foregroundStyle(color)
-                }
-            }
-        }
-        .padding(AppTheme.Spacing.md)
-        .frame(width: 180)
-        .glassEffect()
     }
 
     private func marketOverviewSection() -> some View {
