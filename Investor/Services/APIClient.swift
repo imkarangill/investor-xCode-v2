@@ -8,6 +8,10 @@
 import Foundation
 import os
 
+#if canImport(FirebaseAuth)
+import FirebaseAuth
+#endif
+
 actor APIClient {
     static let shared = APIClient()
     private static let logger = os.Logger(subsystem: "com.investor", category: "APIClient")
@@ -16,11 +20,6 @@ actor APIClient {
 
     private let baseURL = "https://investor-api-service-production.up.railway.app"
     private let apiVersion = "v1"
-
-    // Get Firebase ID token from Keychain for authentication
-    private var authToken: String? {
-        KeychainManager.shared.getAuthToken()
-    }
 
     private let session: URLSession
     private let decoder: JSONDecoder
@@ -59,16 +58,35 @@ actor APIClient {
 
     // MARK: - Private Methods
 
+    /// Get fresh Firebase ID token, using cached token if still valid
+    private func getFreshAuthToken() async throws -> String {
+        #if canImport(FirebaseAuth)
+        guard let user = Auth.auth().currentUser else {
+            let errorMsg = "User not authenticated. Please sign in."
+            Self.logger.error("Firebase user not found: \(errorMsg)")
+            throw APIClientError.unauthorized(message: errorMsg)
+        }
+
+        do {
+            // getIDToken() returns cached token if valid, refreshes if expired
+            let token = try await user.getIDToken()
+            return token
+        } catch {
+            let errorMsg = "Failed to get authentication token: \(error.localizedDescription)"
+            Self.logger.error("Firebase token fetch failed: \(errorMsg)")
+            throw APIClientError.unauthorized(message: errorMsg)
+        }
+        #else
+        throw APIClientError.unauthorized(message: "Firebase not configured")
+        #endif
+    }
+
     private func fetch<T: Decodable>(endpoint: String) async throws -> T {
         guard let url = URL(string: baseURL + endpoint) else {
             throw APIClientError.invalidURL
         }
 
-        guard let token = authToken else {
-            let errorMsg = "No authentication token found. Please sign in."
-            Self.logger.error("Auth token missing - Keychain may not have token. \(errorMsg)")
-            throw APIClientError.unauthorized(message: errorMsg)
-        }
+        let token = try await getFreshAuthToken()
 
         let tokenPreview = String(token.prefix(20)) + "..."
         Self.logger.debug("Making request to \(endpoint) with token: \(tokenPreview)")
