@@ -60,7 +60,20 @@ struct StockHeader: View {
                         .frame(maxWidth: .infinity, alignment: .trailing)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    
+
+                    // Score Display
+                    if let score = overview.score {
+                        HStack(spacing: AppTheme.Spacing.md) {
+                            scoreProgressBar(score: score.overall, maxScore: score.maxScore)
+                            Text("\(score.overall)")
+                                .font(AppTheme.Typography.callout)
+                                .fontWeight(.semibold)
+                                .foregroundStyle(scoreTextColor(score.overall))
+                        }
+                        .padding(.horizontal, AppTheme.Spacing.sm)
+                        .padding(.top, AppTheme.Spacing.xxs)
+                    }
+
                     if expanded {
 
                         // if today is ipo birthday, show special message
@@ -326,6 +339,23 @@ struct DetailItem: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
+}
+
+// MARK: - Score Progress Bar
+
+private func scoreProgressBar(score: Int, maxScore: Int) -> some View {
+    let fillPercentage = Double(score) / Double(maxScore)
+    return GeometryReader { geometry in
+        ZStack(alignment: .leading) {
+            RoundedRectangle(cornerRadius: 4)
+                .foregroundStyle(scoreBackgroundColor(score))
+
+            RoundedRectangle(cornerRadius: 4)
+                .foregroundStyle(scoreTextColor(score))
+                .frame(width: geometry.size.width * fillPercentage)
+        }
+    }
+    .frame(height: 4)
 }
 
 #Preview {
