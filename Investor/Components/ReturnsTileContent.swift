@@ -98,6 +98,7 @@ struct ReturnsTileContent: View {
             analystRatings: nil,
             momentum: nil,
             prices: nil,
+            historicalPrice: nil,
             _metadata: nil
         )
     )

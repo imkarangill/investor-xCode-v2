@@ -6,43 +6,147 @@
 //
 
 import SwiftUI
+import Charts
 
 struct StockHeader: View {
     let overview: StockOverview
+    @State private var showChart = false
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(spacing: AppTheme.Spacing.xxs) {
+            
             // Company Logo and Basic Info
-            HStack(alignment: .top, spacing: 12) {
+            HStack(spacing: AppTheme.Spacing.xxs) {
                 StockLogoImage(imageUrl: overview.profile.image, symbol: overview.symbol, size: 50)
 
-                VStack(alignment: .leading, spacing: 2) {
+                VStack(alignment: .leading, spacing: AppTheme.Spacing.xxs) {
                     if let companyName = overview.profile.companyName {
                         Text(companyName)
                             .font(.headline)
                             .fontWeight(.semibold)
+                            .lineLimit(1)
                     }
                     Text(overview.symbol)
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
-                Spacer()
-                if let price = overview.profile.price {
-                    Text(StockService.formatPrice(price, currency: overview.profile.currency))
-                        .font(.title2)
-                        .fontWeight(.bold)
+                
+                Button(action: { showChart.toggle() }) {
+                    VStack(spacing: AppTheme.Spacing.md) {
+                        if let price = overview.profile.price {
+                            Text(StockService.formatPrice(price, currency: overview.profile.currency))
+                                .font(.title2)
+                                .fontWeight(.bold)
+                        }
+                        Image(systemName: "chevron.down")
+                            .foregroundStyle(.blue)
+                            .rotationEffect(.degrees(showChart ? 180 : 0))
+                            .animation(.easeInOut(duration: 0.6), value: showChart)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .trailing)
                 }
+                .buttonStyle(.plain)
+                
             }
-            .frame(maxWidth: .infinity, alignment: .center)
+            .frame(maxWidth: .infinity, alignment: .leading)
             
+            if showChart {
+                PriceChart(historicalPrice: overview.historicalPrice)
+                    .frame(height: 200)
+            }
+
         }
-        .frame(maxWidth: .infinity, alignment: .center)
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
         .glassEffect(.regular.interactive(), in: RoundedRectangle(cornerRadius: 20))
     }
 }
 
 // MARK: - Helper Components
+
+struct PriceChart: View {
+    // Data structure for price points
+    struct PricePoint: Identifiable {
+        let id = UUID()
+        let date: String
+        let price: Double
+    }
+
+    let historicalPrice: [String: [String: Double]]?
+    @State private var selectedPeriod = "1Y"
+
+    let periods = ["1D", "1W", "1M", "3M", "6M", "1Y", "3Y", "5Y"]
+
+    var chartData: [PricePoint] {
+        guard let historicalPrice = historicalPrice,
+              let periodData = historicalPrice[selectedPeriod] else {
+            return []
+        }
+
+        return periodData
+            .sorted { $0.key < $1.key }
+            .map { dateString, price in
+                // For 1D data with timestamps, extract time (HH:MM)
+                // For other periods, extract date (MM-DD)
+                let displayDate: String
+                if selectedPeriod == "1D" && dateString.contains("T") {
+                    // Extract time from ISO format: "2026-01-30T09:30:00Z" -> "09:30"
+                    let timeComponent = dateString.split(separator: "T").dropFirst().first ?? ""
+                    displayDate = String(timeComponent.prefix(5))
+                } else {
+                    // Extract MM-DD format
+                    displayDate = String(dateString.dropFirst(5).prefix(5)) // Skip "2026-" get "01-30"
+                }
+                return PricePoint(date: displayDate, price: price)
+            }
+    }
+
+    var body: some View {
+        VStack(alignment: .trailing, spacing: AppTheme.Spacing.md) {
+
+            // Chart
+            if chartData.isEmpty {
+                Text("No price data available")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .frame(height: 150)
+            } else {
+                Chart(chartData) { point in
+                    LineMark(
+                        x: .value("Date", point.date),
+                        y: .value("Price", point.price)
+                    )
+                    .foregroundStyle(.blue)
+                }
+                .chartYAxis {
+                    AxisMarks(position: .trailing)
+                }
+                .chartXAxis {
+                    AxisMarks(position: .bottom)
+                }
+                .frame(height: 150)
+            }
+            
+            // Period Selection
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: AppTheme.Spacing.sm) {
+                    ForEach(periods, id: \.self) { period in
+                        Button(action: { selectedPeriod = period }) {
+                            Text(period)
+                                .font(.caption)
+                                .foregroundStyle(selectedPeriod == period ? .blue : .secondary)
+                                .padding(.horizontal, AppTheme.Spacing.sm)
+                                .padding(.vertical, 6)
+                        }
+                    }
+                }
+                .padding(.horizontal, AppTheme.Spacing.md)
+            }
+        }
+        .padding()
+    }
+}
 
 struct DetailItem: View {
     let label: String
@@ -127,6 +231,202 @@ struct DetailItem: View {
         analystRatings: nil,
         momentum: nil,
         prices: nil,
+        historicalPrice: [
+            "o": [
+                "2000-01-03": 100.52,
+                "2001-02-15": 102.18,
+                "2002-03-20": 98.75,
+                "2003-04-10": 105.42,
+                "2004-05-18": 112.65,
+                "2005-06-22": 118.32,
+                "2006-07-30": 125.48,
+                "2007-08-12": 132.15,
+                "2008-09-25": 128.95,
+                "2009-10-14": 138.22,
+                "2010-11-03": 145.75,
+                "2011-12-20": 152.48,
+                "2012-01-15": 158.32,
+                "2013-02-28": 165.95,
+                "2014-03-14": 172.18,
+                "2015-04-22": 178.45,
+                "2016-05-10": 185.62,
+                "2017-06-18": 192.35,
+                "2018-07-25": 198.72,
+                "2019-08-05": 205.48,
+                "2020-09-12": 212.15,
+                "2021-10-20": 218.92,
+                "2022-11-08": 224.35,
+                "2023-12-15": 228.95,
+                "2024-01-20": 230.15,
+                "2025-02-10": 227.82,
+                "2026-01-30": 228.65
+            ],
+            "5Y": [
+                "2021-01-04": 130.73,
+                "2021-02-08": 138.55,
+                "2021-03-15": 145.32,
+                "2021-04-22": 152.18,
+                "2021-05-30": 158.95,
+                "2021-06-14": 165.42,
+                "2021-07-20": 172.35,
+                "2021-08-25": 178.92,
+                "2021-09-10": 185.48,
+                "2021-10-18": 192.15,
+                "2021-11-22": 198.72,
+                "2021-12-30": 205.35,
+                "2022-01-15": 210.48,
+                "2022-02-20": 215.32,
+                "2022-03-28": 218.95,
+                "2022-04-10": 220.15,
+                "2022-05-18": 219.82,
+                "2022-06-25": 218.45,
+                "2022-07-30": 215.95,
+                "2022-08-12": 212.35,
+                "2022-09-20": 210.48,
+                "2022-10-28": 208.95,
+                "2022-11-15": 210.32,
+                "2022-12-22": 215.48,
+                "2023-01-20": 220.35,
+                "2023-02-28": 225.18,
+                "2023-03-15": 228.95,
+                "2023-04-22": 230.15,
+                "2023-05-30": 228.82,
+                "2023-06-14": 228.65,
+                "2023-07-20": 228.92,
+                "2023-08-25": 229.35,
+                "2023-09-10": 229.72,
+                "2023-10-18": 230.15,
+                "2023-11-22": 230.48,
+                "2023-12-30": 230.95,
+                "2024-01-15": 231.32,
+                "2024-02-20": 231.95,
+                "2024-03-28": 232.35,
+                "2024-04-10": 232.82,
+                "2024-05-18": 232.48,
+                "2024-06-25": 232.15,
+                "2024-07-30": 231.82,
+                "2024-08-12": 231.35,
+                "2024-09-20": 230.95,
+                "2024-10-28": 230.48,
+                "2024-11-15": 230.15,
+                "2024-12-22": 229.82,
+                "2025-01-20": 229.35,
+                "2025-02-28": 228.95,
+                "2025-03-15": 228.65,
+                "2025-04-22": 228.82,
+                "2025-05-30": 229.15,
+                "2025-06-14": 229.48,
+                "2025-07-20": 229.82,
+                "2025-08-25": 229.95,
+                "2025-09-10": 230.18,
+                "2025-10-18": 230.35,
+                "2025-11-22": 230.48,
+                "2025-12-30": 228.95,
+                "2026-01-30": 228.65
+            ],
+            "3Y": [
+                "2023-01-31": 150.93,
+                "2023-02-15": 155.28,
+                "2023-03-10": 160.45,
+                "2023-04-12": 165.73,
+                "2023-05-18": 170.92,
+                "2023-06-22": 175.35,
+                "2023-07-28": 179.48,
+                "2023-08-15": 183.92,
+                "2023-09-20": 188.15,
+                "2023-10-25": 192.45,
+                "2023-11-30": 196.82,
+                "2023-12-20": 200.35,
+                "2024-01-10": 202.95,
+                "2024-02-15": 205.48,
+                "2024-03-20": 208.15,
+                "2024-04-25": 210.82,
+                "2024-05-22": 213.35,
+                "2024-06-18": 215.48,
+                "2024-07-25": 217.92,
+                "2024-08-20": 219.35,
+                "2024-09-18": 220.95,
+                "2024-10-22": 222.18,
+                "2024-11-20": 223.45,
+                "2024-12-18": 224.95,
+                "2025-01-15": 225.82,
+                "2025-02-20": 226.45,
+                "2025-03-18": 227.35,
+                "2025-04-22": 228.15,
+                "2025-05-20": 228.82,
+                "2025-06-25": 229.35,
+                "2025-07-22": 229.95,
+                "2025-08-20": 230.28,
+                "2025-09-18": 230.62,
+                "2025-10-22": 230.95,
+                "2025-11-20": 229.82,
+                "2025-12-18": 229.35,
+                "2026-01-30": 228.65
+            ],
+            "1Y": [
+                "2025-01-31": 192.48,
+                "2025-02-14": 194.82,
+                "2025-03-14": 197.35,
+                "2025-04-10": 200.18,
+                "2025-05-15": 203.45,
+                "2025-06-20": 206.82,
+                "2025-07-18": 210.15,
+                "2025-08-22": 213.35,
+                "2025-09-19": 216.45,
+                "2025-10-17": 219.82,
+                "2025-11-21": 223.15,
+                "2025-12-19": 226.48,
+                "2026-01-09": 227.95,
+                "2026-01-23": 228.35,
+                "2026-01-30": 228.65
+            ],
+            "6M": [
+                "2025-07-31": 212.35,
+                "2025-08-15": 214.82,
+                "2025-09-10": 217.35,
+                "2025-10-15": 220.15,
+                "2025-11-20": 223.45,
+                "2025-12-20": 225.82,
+                "2026-01-09": 227.35,
+                "2026-01-23": 228.15,
+                "2026-01-30": 228.65
+            ],
+            "3M": [
+                "2025-10-31": 218.92,
+                "2025-11-14": 221.35,
+                "2025-12-10": 224.18,
+                "2026-01-09": 226.82,
+                "2026-01-23": 227.95,
+                "2026-01-30": 228.65
+            ],
+            "1M": [
+                "2025-12-31": 224.35,
+                "2026-01-08": 226.15,
+                "2026-01-15": 227.45,
+                "2026-01-23": 228.25,
+                "2026-01-30": 228.65
+            ],
+            "1W": [
+                "2026-01-24": 227.85,
+                "2026-01-27": 228.15,
+                "2026-01-30": 228.65
+            ],
+            "1D": [
+                "2026-01-30T09:30:00Z": 226.50,
+                "2026-01-30T10:00:00Z": 226.50,
+                "2026-01-30T10:30:00Z": 226.50,
+                "2026-01-30T11:00:00Z": 226.50,
+                "2026-01-30T11:30:00Z": 226.50,
+                "2026-01-30T12:00:00Z": 226.50,
+                "2026-01-30T12:30:00Z": 226.50,
+                "2026-01-30T13:00:00Z": 226.50,
+                "2026-01-30T13:30:00Z": 226.50,
+                "2026-01-30T14:00:00Z": 226.50,
+                "2026-01-30T14:30:00Z": 226.50,
+                "2026-01-30T15:00:00Z": 226.50,
+                "2026-01-30T15:30:00Z": 226.50
+            ]
+        ],
         _metadata: nil
     ))
     .padding()

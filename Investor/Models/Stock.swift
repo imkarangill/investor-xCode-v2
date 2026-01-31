@@ -215,6 +215,7 @@ struct StockOverview: Codable, Identifiable, Sendable {
     let analystRatings: [String: Double]?
     let momentum: Momentum?
     let prices: [String: PricePoint]?
+    let historicalPrice: [String: [String: Double]]?
     let _metadata: APIMetadata?
 
     var id: String { symbol }
