@@ -69,6 +69,7 @@ struct PriceChart: View {
     struct PricePoint: Identifiable {
         let id = UUID()
         let date: String
+        let displayLabel: String
         let price: Double
     }
 
@@ -76,6 +77,35 @@ struct PriceChart: View {
     @State private var selectedPeriod = "1Y"
 
     let periods = ["1D", "1W", "1M", "3M", "6M", "1Y", "3Y", "5Y"]
+
+    func formatLabel(dateString: String, period: String) -> String {
+        if period == "1D" && dateString.contains("T") {
+            // Time only: "2026-01-30T09:30:00Z" -> "09:30"
+            let timeComponent = dateString.split(separator: "T").dropFirst().first ?? ""
+            return String(timeComponent.prefix(5))
+        } else if period == "1W" {
+            // Day of week and date: "2026-01-30" -> "Thu 01-30"
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy-MM-dd"
+            if let date = formatter.date(from: dateString) {
+                formatter.dateFormat = "EEE MM-dd"
+                return formatter.string(from: date)
+            }
+            return String(dateString.dropFirst(5).prefix(5))
+        } else if period == "1M" {
+            // Date: "2026-01-30" -> "01-30"
+            return String(dateString.dropFirst(5).prefix(5))
+        } else {
+            // Longer periods: "2026-01-30" -> "Jan 30"
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy-MM-dd"
+            if let date = formatter.date(from: dateString) {
+                formatter.dateFormat = period == "1Y" ? "MMM dd" : "MMM 'yy"
+                return formatter.string(from: date)
+            }
+            return String(dateString.dropFirst(5).prefix(5))
+        }
+    }
 
     var chartData: [PricePoint] {
         guard let historicalPrice = historicalPrice,
@@ -86,19 +116,22 @@ struct PriceChart: View {
         return periodData
             .sorted { $0.key < $1.key }
             .map { dateString, price in
-                // For 1D data with timestamps, extract time (HH:MM)
-                // For other periods, extract date (MM-DD)
-                let displayDate: String
-                if selectedPeriod == "1D" && dateString.contains("T") {
-                    // Extract time from ISO format: "2026-01-30T09:30:00Z" -> "09:30"
-                    let timeComponent = dateString.split(separator: "T").dropFirst().first ?? ""
-                    displayDate = String(timeComponent.prefix(5))
-                } else {
-                    // Extract MM-DD format
-                    displayDate = String(dateString.dropFirst(5).prefix(5)) // Skip "2026-" get "01-30"
-                }
-                return PricePoint(date: displayDate, price: price)
+                let displayLabel = formatLabel(dateString: dateString, period: selectedPeriod)
+                return PricePoint(date: dateString, displayLabel: displayLabel, price: price)
             }
+    }
+
+    var axisLabelDates: [String] {
+        guard chartData.count > 0 else { return [] }
+        let step = max(1, chartData.count / 5)
+        var labels: [String] = []
+        for i in stride(from: 0, to: chartData.count, by: step) {
+            labels.append(chartData[i].displayLabel)
+        }
+        if let last = chartData.last?.displayLabel, !labels.contains(last) {
+            labels.append(last)
+        }
+        return labels
     }
 
     var body: some View {
@@ -114,16 +147,20 @@ struct PriceChart: View {
             } else {
                 Chart(chartData) { point in
                     LineMark(
-                        x: .value("Date", point.date),
+                        x: .value("Date", point.displayLabel),
                         y: .value("Price", point.price)
                     )
                     .foregroundStyle(.blue)
                 }
                 .chartYAxis {
-                    AxisMarks(position: .trailing)
+                    AxisMarks(position: .trailing) { _ in
+                        AxisValueLabel()
+                    }
                 }
                 .chartXAxis {
-                    AxisMarks(position: .bottom)
+                    AxisMarks(position: .bottom, values: axisLabelDates) { _ in
+                        AxisValueLabel()
+                    }
                 }
                 .frame(height: 150)
             }
