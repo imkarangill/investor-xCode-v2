@@ -60,6 +60,9 @@ struct AppTheme {
     // MARK: - Spacing
 
     struct Spacing {
+        static let xxxxxxs: CGFloat = 0.1
+        static let xxxxxs: CGFloat = 0.5
+        static let xxxxs: CGFloat = 1
         static let xxxs: CGFloat = 2
         static let xxs: CGFloat = 4
         static let xs: CGFloat = 8

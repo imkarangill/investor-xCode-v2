@@ -33,10 +33,12 @@ struct StockHeader: View {
                         .fontWeight(.bold)
                 }
             }
+            .frame(maxWidth: .infinity, alignment: .center)
+            
         }
-        .frame(maxWidth: .infinity, alignment: .topLeading)
+        .frame(maxWidth: .infinity, alignment: .center)
         .padding()
-        .glassEffect(.regular.interactive(), in: .containerRelative)
+        .glassEffect(.regular.interactive(), in: RoundedRectangle(cornerRadius: 20))
     }
 }
 

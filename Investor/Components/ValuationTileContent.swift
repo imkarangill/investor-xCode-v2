@@ -12,23 +12,57 @@ struct ValuationTileContent: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            if let valuation = overview.valuation, !valuation.isEmpty {
-                // Header
-                Text("Valuation")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .padding(.vertical, 8)
+            if let valuation = overview.valuation {
+                // Header row
+                ValuationTableHeader(headerText: "Valuation")
 
                 Divider()
 
-                // Display valuation metrics
-                ForEach(Array(valuation.sorted { $0.key < $1.key }.enumerated()), id: \.element.key) { index, item in
-//                    ValuationMetricRow(label: item.key, value: item.value)
+                // P/E Ratio
+                ValuationTableRow(
+                    label: "P/E Ratio",
+                    metrics: valuation.peRatio
+                )
 
-                    if index < valuation.count - 1 {
-                        Divider()
-                    }
-                }
+                Divider()
+
+                // P/B Ratio
+                ValuationTableRow(
+                    label: "P/B Ratio",
+                    metrics: valuation.pbRatio
+                )
+
+                Divider()
+
+                // PEG Ratio
+                ValuationTableRow(
+                    label: "PEG Ratio",
+                    metrics: valuation.pegRatio
+                )
+
+                Divider()
+
+                // Market Cap / FCF
+                ValuationTableRow(
+                    label: "MCap / FCF",
+                    metrics: valuation.marketCapToFcf
+                )
+
+                Divider()
+
+                // EV / Earnings
+                ValuationTableRow(
+                    label: "EV / Earnings",
+                    metrics: valuation.evToEarnings
+                )
+
+                Divider()
+
+                // Market Cap / Book Value
+                ValuationTableRow(
+                    label: "MCap / Book",
+                    metrics: valuation.marketCapToBookValue
+                )
             } else {
                 VStack(spacing: 6) {
                     Image(systemName: "exclamationmark.triangle")
@@ -46,26 +80,55 @@ struct ValuationTileContent: View {
     }
 }
 
-// MARK: - Helper Components
+// MARK: - Valuation Table Components
 
-struct ValuationMetricRow: View {
-    let label: String
-    let value: Double
+struct ValuationTableHeader: View {
+    let headerText: String
 
     var body: some View {
-        HStack(spacing: 12) {
-            Text(label)
-                .font(.caption)
-                .foregroundStyle(.primary)
+        HStack(spacing: 0) {
+            Text(headerText)
+                .frame(width: 100, alignment: .leading)
+                .font(AppTheme.Typography.subheadline)
+                .bold()
 
-            Spacer()
-
-            Text(String(format: "%.2f", value))
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .fontWeight(.medium)
+            ForEach(ValuationPeriodMetrics.periodLabels, id: \.self) { period in
+                Text(period)
+                    .font(AppTheme.Typography.caption)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity)
+            }
         }
-        .padding(.vertical, 8)
+        .padding(.vertical, AppTheme.Spacing.xxs)
+    }
+}
+
+struct ValuationTableRow: View {
+    let label: String
+    let metrics: ValuationPeriodMetrics
+
+    var body: some View {
+        HStack(spacing: 0) {
+            // Label
+            Text(label)
+                .font(AppTheme.Typography.caption)
+                .foregroundStyle(.primary)
+                .frame(width: 100, alignment: .leading)
+
+            // Values (6 columns)
+            ForEach(Array(metrics.allValues.enumerated()), id: \.offset) { _, value in
+                Text(formattedValue(value))
+                    .font(AppTheme.Typography.caption)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity)
+            }
+        }
+        .padding(.vertical, AppTheme.Spacing.xxs)
+    }
+
+    private func formattedValue(_ value: Double?) -> String {
+        guard let value = value else { return "—" }
+        return String(format: "%.2f", value)
     }
 }
 
@@ -133,12 +196,32 @@ struct ValuationMetricRow: View {
                 currentRatio: PeriodMetrics(fiveYear: 1.0, threeYear: 0.0, twoYear: 0.0, oneYear: 0.0, sixMonth: 0.0),
                 quickRatio: PeriodMetrics(fiveYear: 1.0, threeYear: 0.0, twoYear: 0.0, oneYear: 0.0, sixMonth: 0.0)
             ),
-            valuation: [
-                "peRatio": ["f":8.45],
-                "pbRatio": ["f":8.45],
-                "pegRatio": ["f":8.45],
-                "psRatio": ["f":8.45]
-            ],
+            valuation: ValuationMetrics(
+                peRatio: ValuationPeriodMetrics(
+                    today: 35.42, sixMonth: nil, oneYear: 35.40,
+                    twoYear: 34.10, threeYear: 32.50, fiveYear: 28.30
+                ),
+                pbRatio: ValuationPeriodMetrics(
+                    today: 60.20, sixMonth: 60.20, oneYear: 58.70,
+                    twoYear: 55.80, threeYear: 52.30, fiveYear: 48.20
+                ),
+                pegRatio: ValuationPeriodMetrics(
+                    today: 2.95, sixMonth: nil, oneYear: 2.95,
+                    twoYear: 2.90, threeYear: 2.80, fiveYear: 2.50
+                ),
+                marketCapToFcf: ValuationPeriodMetrics(
+                    today: 28.50, sixMonth: nil, oneYear: 28.50,
+                    twoYear: 27.50, threeYear: 26.80, fiveYear: 25.10
+                ),
+                evToEarnings: ValuationPeriodMetrics(
+                    today: nil, sixMonth: nil, oneYear: nil,
+                    twoYear: nil, threeYear: nil, fiveYear: nil
+                ),
+                marketCapToBookValue: ValuationPeriodMetrics(
+                    today: 17.20, sixMonth: 17.20, oneYear: 16.50,
+                    twoYear: 15.10, threeYear: 14.20, fiveYear: 12.30
+                )
+            ),
             earnings: [],
             dividends: [],
             analystRatings: nil,

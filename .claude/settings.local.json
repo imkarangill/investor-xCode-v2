@@ -13,7 +13,16 @@
       "Bash(ruby -e:*)",
       "Bash(git push:*)",
       "Bash(xcrun simctl:*)",
-      "Bash(git reset:*)"
+      "Bash(git reset:*)",
+      "Bash(grep:*)",
+      "Bash(git --no-pager diff:*)",
+      "Bash(tree:*)",
+      "Bash(security delete-generic-password:*)",
+      "Bash(xargs cat:*)",
+      "Bash(defaults read:*)",
+      "Bash(curl:*)",
+      "Bash(python3:*)",
+      "Bash(swift -frontend -typecheck:*)"
     ]
   }
 }

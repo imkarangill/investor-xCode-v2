@@ -6,13 +6,33 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		C3CC4B002F269A2B0061BE13 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = C3CC4AFF2F269A2B0061BE13 /* GoogleSignIn */; };
+		C3CC4B022F269A2B0061BE13 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = C3CC4B012F269A2B0061BE13 /* GoogleSignInSwift */; };
+		C3DDE8072F269E1100EA99B0 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = C3DDE8062F269E1100EA99B0 /* FirebaseAuth */; };
+		C3DDE8092F269E1100EA99B0 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = C3DDE8082F269E1100EA99B0 /* FirebaseCore */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		C319211F2F1C282900B0DB0E /* Investor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Investor.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		C35AF4072F26985B0002DBAB /* Exceptions for "Investor" folder in "Investor" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = C319211E2F1C282900B0DB0E /* Investor */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		C31921212F1C282900B0DB0E /* Investor */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				C35AF4072F26985B0002DBAB /* Exceptions for "Investor" folder in "Investor" target */,
+			);
 			path = Investor;
 			sourceTree = "<group>";
 		};
@@ -23,6 +43,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C3CC4B002F269A2B0061BE13 /* GoogleSignIn in Frameworks */,
+				C3DDE8072F269E1100EA99B0 /* FirebaseAuth in Frameworks */,
+				C3DDE8092F269E1100EA99B0 /* FirebaseCore in Frameworks */,
+				C3CC4B022F269A2B0061BE13 /* GoogleSignInSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -32,8 +56,6 @@
 		C31921162F1C282900B0DB0E = {
 			isa = PBXGroup;
 			children = (
-				C319215D2F1C286D00B0DB0E /* InvestorTests */,
-				C319215E2F1C286D00B0DB0E /* InvestorUITests */,
 				C31921212F1C282900B0DB0E /* Investor */,
 				C31921202F1C282900B0DB0E /* Products */,
 			);
@@ -45,20 +67,6 @@
 				C319211F2F1C282900B0DB0E /* Investor.app */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		C319215D2F1C286D00B0DB0E /* InvestorTests */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = InvestorTests;
-			sourceTree = "<group>";
-		};
-		C319215E2F1C286D00B0DB0E /* InvestorUITests */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = InvestorUITests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -81,6 +89,10 @@
 			);
 			name = Investor;
 			packageProductDependencies = (
+				C3CC4AFF2F269A2B0061BE13 /* GoogleSignIn */,
+				C3CC4B012F269A2B0061BE13 /* GoogleSignInSwift */,
+				C3DDE8062F269E1100EA99B0 /* FirebaseAuth */,
+				C3DDE8082F269E1100EA99B0 /* FirebaseCore */,
 			);
 			productName = Investor;
 			productReference = C319211F2F1C282900B0DB0E /* Investor.app */;
@@ -110,6 +122,10 @@
 			);
 			mainGroup = C31921162F1C282900B0DB0E;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				C3CC4AFE2F269A2B0061BE13 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+				C3CC4B032F269A540061BE13 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = C31921202F1C282900B0DB0E /* Products */;
 			projectDirPath = "";
@@ -260,13 +276,25 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Investor/Investor.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = H3LZXP9V33;
 				ENABLE_APP_SANDBOX = YES;
+				ENABLE_INCOMING_NETWORK_CONNECTIONS = NO;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
+				ENABLE_RESOURCE_ACCESS_BLUETOOTH = NO;
+				ENABLE_RESOURCE_ACCESS_CALENDARS = NO;
+				ENABLE_RESOURCE_ACCESS_CAMERA = NO;
+				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;
+				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
+				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
+				ENABLE_RESOURCE_ACCESS_USB = NO;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Investor/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
@@ -283,7 +311,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.1;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.blackcat.karangill.Investor;
+				PRODUCT_BUNDLE_IDENTIFIER = com.blackcat.investor.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
@@ -304,13 +332,25 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Investor/Investor.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = H3LZXP9V33;
 				ENABLE_APP_SANDBOX = YES;
+				ENABLE_INCOMING_NETWORK_CONNECTIONS = NO;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
+				ENABLE_RESOURCE_ACCESS_BLUETOOTH = NO;
+				ENABLE_RESOURCE_ACCESS_CALENDARS = NO;
+				ENABLE_RESOURCE_ACCESS_CAMERA = NO;
+				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;
+				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
+				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
+				ENABLE_RESOURCE_ACCESS_USB = NO;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Investor/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
@@ -327,7 +367,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.1;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.blackcat.karangill.Investor;
+				PRODUCT_BUNDLE_IDENTIFIER = com.blackcat.investor.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
@@ -365,6 +405,48 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		C3CC4AFE2F269A2B0061BE13 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 9.1.0;
+			};
+		};
+		C3CC4B032F269A540061BE13 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.8.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		C3CC4AFF2F269A2B0061BE13 /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C3CC4AFE2F269A2B0061BE13 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
+		};
+		C3CC4B012F269A2B0061BE13 /* GoogleSignInSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C3CC4AFE2F269A2B0061BE13 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignInSwift;
+		};
+		C3DDE8062F269E1100EA99B0 /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C3CC4B032F269A540061BE13 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		C3DDE8082F269E1100EA99B0 /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C3CC4B032F269A540061BE13 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = C31921172F1C282900B0DB0E /* Project object */;
 }
