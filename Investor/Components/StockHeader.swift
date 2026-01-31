@@ -62,17 +62,16 @@ struct StockHeader: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
 
                     // Score Display
-                    if let score = overview.score {
-                        HStack(spacing: AppTheme.Spacing.md) {
-                            scoreProgressBar(score: score.overall, maxScore: score.maxScore)
-                            Text("\(score.overall)")
-                                .font(AppTheme.Typography.callout)
-                                .fontWeight(.semibold)
-                                .foregroundStyle(scoreTextColor(score.overall))
-                        }
-                        .padding(.horizontal, AppTheme.Spacing.sm)
-                        .padding(.top, AppTheme.Spacing.xxs)
+                    let scorePercentage = Int((Double(overview.score.overall) / Double(overview.score.maxScore)) * 100)
+                    HStack(spacing: AppTheme.Spacing.md) {
+                        scoreProgressBar(score: scorePercentage)
+                        Text("\(scorePercentage)")
+                            .font(AppTheme.Typography.callout)
+                            .fontWeight(.semibold)
+                            .foregroundStyle(scoreTextColor(scorePercentage))
                     }
+                    .padding(.horizontal, AppTheme.Spacing.sm)
+                    .padding(.top, AppTheme.Spacing.xxs)
 
                     if expanded {
 
@@ -343,8 +342,8 @@ struct DetailItem: View {
 
 // MARK: - Score Progress Bar
 
-private func scoreProgressBar(score: Int, maxScore: Int) -> some View {
-    let fillPercentage = Double(score) / Double(maxScore)
+private func scoreProgressBar(score: Int) -> some View {
+    let fillPercentage = Double(score) / 100.0
     return GeometryReader { geometry in
         ZStack(alignment: .leading) {
             RoundedRectangle(cornerRadius: 4)
