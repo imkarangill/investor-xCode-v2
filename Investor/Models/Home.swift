@@ -16,6 +16,12 @@ struct PriceChanges: Codable, Sendable {
     let m1: String?      // 1-month change percentage
 }
 
+// MARK: - Earnings Notification
+
+struct EarningsNotification: Codable, Sendable {
+    let message: String?
+}
+
 // MARK: - Portfolio Item
 
 struct PortfolioItem: Codable, Identifiable, Sendable {
@@ -26,8 +32,9 @@ struct PortfolioItem: Codable, Identifiable, Sendable {
     let quantity: String
     let value: String
     let price: String
-    let score: Int
+    let score: Int?
     let priceChanges: PriceChanges
+    let earnings: EarningsNotification?
 
     var id: String { symbol }
 
@@ -41,6 +48,7 @@ struct PortfolioItem: Codable, Identifiable, Sendable {
         case price
         case score
         case priceChanges = "price_changes"
+        case earnings
     }
 }
 
@@ -51,8 +59,9 @@ struct WatchlistStock: Codable, Identifiable, Sendable {
     let companyName: String
     let image: String?
     let price: String
-    let score: Int
+    let score: Int?
     let priceChanges: PriceChanges
+    let earnings: EarningsNotification?
 
     var id: String { symbol }
 
@@ -63,6 +72,7 @@ struct WatchlistStock: Codable, Identifiable, Sendable {
         case price
         case score
         case priceChanges = "price_changes"
+        case earnings
     }
 }
 
@@ -92,8 +102,9 @@ struct RecentlyViewedItem: Codable, Identifiable, Sendable {
     let image: String?
     let currency: String
     let price: String
-    let score: Int
+    let score: Int?
     let priceChanges: PriceChanges
+    let earnings: EarningsNotification?
 
     var id: String { symbol }
 
@@ -105,6 +116,7 @@ struct RecentlyViewedItem: Codable, Identifiable, Sendable {
         case price
         case score
         case priceChanges = "price_changes"
+        case earnings
     }
 }
 

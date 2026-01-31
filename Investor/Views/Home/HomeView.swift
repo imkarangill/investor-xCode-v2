@@ -84,9 +84,22 @@ struct HomeView: View {
                 StockLogoImage(imageUrl: item.image, symbol: item.symbol, size: 36)
 
                 VStack(alignment: .leading, spacing: AppTheme.Spacing.xxs) {
-                    Text(item.symbol)
-                        .font(AppTheme.Typography.caption2)
-                        .foregroundStyle(AppTheme.Colors.secondaryText)
+                    HStack(spacing: AppTheme.Spacing.xs) {
+                        Text(item.symbol)
+                            .font(AppTheme.Typography.caption2)
+                            .foregroundStyle(AppTheme.Colors.secondaryText)
+
+                        if let earnings = item.earnings, let message = earnings.message {
+                            Text(message)
+                                .font(AppTheme.Typography.caption2)
+                                .fontWeight(.semibold)
+                                .foregroundStyle(.white)
+                                .padding(.horizontal, AppTheme.Spacing.xs)
+                                .padding(.vertical, 2)
+                                .background(AppTheme.Colors.accent)
+                                .clipShape(Capsule())
+                        }
+                    }
 
                     Text(item.companyName)
                         .font(AppTheme.Typography.callout)
@@ -200,10 +213,23 @@ struct HomeView: View {
             StockLogoImage(imageUrl: stock.image, symbol: stock.symbol, size: 28)
 
             VStack(alignment: .leading, spacing: AppTheme.Spacing.xxs) {
-                Text(stock.symbol)
-                    .font(AppTheme.Typography.caption2)
-                    .fontWeight(.semibold)
-                    .foregroundStyle(AppTheme.Colors.primaryText)
+                HStack(spacing: AppTheme.Spacing.xs) {
+                    Text(stock.symbol)
+                        .font(AppTheme.Typography.caption2)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(AppTheme.Colors.primaryText)
+
+                    if let earnings = stock.earnings, let message = earnings.message {
+                        Text(message)
+                            .font(AppTheme.Typography.caption2)
+                            .fontWeight(.semibold)
+                            .foregroundStyle(.white)
+                            .padding(.horizontal, AppTheme.Spacing.xs)
+                            .padding(.vertical, 2)
+                            .background(AppTheme.Colors.accent)
+                            .clipShape(Capsule())
+                    }
+                }
 
                 HStack(spacing: AppTheme.Spacing.xxs) {
                     if let changeStr = stock.priceChanges.d1, let change = Double(changeStr) {
@@ -373,58 +399,6 @@ struct HomeView: View {
         }
     }
 
-    private func formatPercentage(_ value: Double) -> String {
-        let sign = value >= 0 ? "+" : ""
-        return String(format: "%@%.2f%%", sign, value)
-    }
-
-    private func formatPrice(_ priceStr: String) -> String {
-        guard let price = Double(priceStr) else { return "—" }
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
-        formatter.currencyCode = "USD"
-        formatter.minimumFractionDigits = 2
-        formatter.maximumFractionDigits = 2
-        return formatter.string(from: NSNumber(value: price)) ?? "—"
-    }
-
-    private func scoreBadge(_ score: Int, size: BadgeSize = .normal) -> some View {
-        let backgroundColor: Color
-        if score >= 70 {
-            backgroundColor = .green.opacity(0.2)
-        } else if score >= 50 {
-            backgroundColor = .orange.opacity(0.2)
-        } else {
-            backgroundColor = .red.opacity(0.2)
-        }
-
-        let textColor: Color
-        if score >= 70 {
-            textColor = .green
-        } else if score >= 50 {
-            textColor = .orange
-        } else {
-            textColor = .red
-        }
-
-        let (fontSize, padding) = size == .small ?
-            (AppTheme.Typography.caption2, AppTheme.Spacing.xs) :
-            (AppTheme.Typography.callout, AppTheme.Spacing.sm)
-
-        return Text("\(score)")
-            .font(fontSize)
-            .fontWeight(.semibold)
-            .foregroundStyle(textColor)
-            .padding(.horizontal, padding)
-            .padding(.vertical, AppTheme.Spacing.xxs)
-            .background(backgroundColor)
-            .clipShape(Capsule())
-    }
-
-    enum BadgeSize {
-        case small
-        case normal
-    }
 }
 
 #Preview {
