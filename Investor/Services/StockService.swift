@@ -43,12 +43,15 @@ class StockService: ObservableObject {
         do {
             let overview = try await apiClient.fetchStockOverview(symbol: symbol)
 
-            // Extract and store subscription limit information from metadata
-            if let viewStats = overview._metadata?.viewStats {
-                self.viewsUsed = viewStats.viewsUsed
-                self.viewsLimit = viewStats.viewsLimit
-                self.viewsRemaining = viewStats.viewsRemaining
-                self.subscriptionTier = viewStats.tier
+            // Safely extract and store subscription limit information from metadata
+            // Using separate unwrapping to avoid potential memory access issues
+            if let metadata = overview._metadata {
+                if let viewStats = metadata.viewStats {
+                    viewsUsed = viewStats.viewsUsed
+                    viewsLimit = viewStats.viewsLimit
+                    viewsRemaining = viewStats.viewsRemaining
+                    subscriptionTier = viewStats.tier
+                }
             }
 
             stockOverview = overview

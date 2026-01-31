@@ -71,7 +71,8 @@ struct RatiosTileContent: View {
                 description: "Apple Inc. designs, manufactures, and markets smartphones...",
                 website: "https://www.apple.com",
                 employees: "164000",
-                image: "https://images.financialmodelingprep.com/symbol/AAPL.png"
+                image: "https://images.financialmodelingprep.com/symbol/AAPL.png",
+                ipoDate: "1980-12-12"
             ),
             score: StockScore(
                 overall: 99,

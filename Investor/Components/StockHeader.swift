@@ -62,7 +62,23 @@ struct StockHeader: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     
                     if expanded {
-                        Divider().padding(.vertical, AppTheme.Spacing.md)
+
+                        // if today is ipo birthday, show special message
+                        if let ipoDate = overview.profile.ipoDate, let years = getIPOAnniversaryYears(ipoDate) {
+                            HStack(spacing: AppTheme.Spacing.xs) {
+                                Text("🎉")
+                                Text("IPO Anniversary - \(years) \(years == 1 ? "year" : "years")!")
+                                    .font(.caption)
+                                    .fontWeight(.semibold)
+                                Text("🎉")
+                            }
+                            .foregroundStyle(.secondary)
+                            .padding(.vertical, AppTheme.Spacing.sm)
+                            //.frame(maxWidth: .infinity)
+                            //.glassEffect(.regular, in: .capsule)
+                        }
+
+                        Divider().padding(.vertical, AppTheme.Spacing.sm)
                         ScrollView {
                             PriceChart(historicalPrice: overview.historicalPrice)
                                 .frame(height: 200)
@@ -83,8 +99,19 @@ struct StockHeader: View {
                                     if let employees = overview.profile.employees {
                                         DetailItem(label: "Employees", value: employees)
                                     }
-                                    if let website = overview.profile.website {
-                                        DetailItem(label: "Website", value: website)
+                                    if let website = overview.profile.website, let url = URL(string: website.hasPrefix("http") ? website : "https://\(website)") {
+                                        VStack(alignment: .leading) {
+                                            Text("Website")
+                                                .font(.caption)
+                                                .foregroundStyle(.secondary)
+                                            Link(website, destination: url)
+                                                .font(.caption)
+                                                .foregroundStyle(.blue)
+                                        }
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                    }
+                                    if let ipoDate = overview.profile.ipoDate {
+                                        DetailItem(label: "IPO Date", value: formatIPODate(ipoDate))
                                     }
                                     if let description = overview.profile.description {
                                         DetailItem(label: "About", value: description)
@@ -93,6 +120,7 @@ struct StockHeader: View {
                             }
                             .padding(.top, AppTheme.Spacing.md)
                         }
+                        .frame(maxHeight: 500)
 
                     }
                 }
@@ -246,7 +274,10 @@ struct DetailItem: View {
 
             Text(value)
                 .font(.caption)
+                .lineLimit(nil)
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 
@@ -275,7 +306,8 @@ struct DetailItem: View {
             description: "Apple Inc. designs, manufactures, and markets smartphones...",
             website: "https://www.apple.com",
             employees: "164000",
-            image: "https://images.financialmodelingprep.com/symbol/AAPL.png"
+            image: "https://images.financialmodelingprep.com/symbol/AAPL.png",
+            ipoDate: "1980-12-12"
         ),
         score: StockScore(
             overall: 99,

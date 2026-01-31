@@ -66,7 +66,8 @@ struct GrowthTileContent: View {
                 description: nil,
                 website: "https://apple.com",
                 employees: "164000",
-                image: nil
+                image: nil,
+                ipoDate: "1980-12-12"
             ),
             score: StockScore(
                 overall: 75,

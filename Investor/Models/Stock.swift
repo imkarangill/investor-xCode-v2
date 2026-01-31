@@ -102,6 +102,7 @@ struct StockProfile: Codable, Sendable {
     let website: String?
     let employees: String?
     let image: String?
+    let ipoDate: String?
 }
 
 // MARK: - Score Breakdown

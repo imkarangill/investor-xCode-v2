@@ -95,7 +95,7 @@ actor APIClient {
         let token = try await getFreshAuthToken()
 
         let tokenPreview = String(token.prefix(20)) + "..."
-        Self.logger.debug("Making request to \(endpoint) with token: \(tokenPreview)")
+        print("Making request to \(endpoint) with token: \(tokenPreview)")
 
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
@@ -103,46 +103,57 @@ actor APIClient {
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         request.setValue("Mozilla/5.0 (iPhone; CPU iPhone OS 17_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.2 Mobile/15E148 Safari/604.1", forHTTPHeaderField: "User-Agent")
 
+        print("🌐 [APIClient] Fetching data from \(endpoint)...")
         let (data, response) = try await session.data(for: request)
+        print("📦 [APIClient] Received response from \(endpoint)")
 
         guard let httpResponse = response as? HTTPURLResponse else {
             throw APIClientError.invalidResponse
         }
 
+        print("📊 [APIClient] Status code: \(httpResponse.statusCode)")
+
         switch httpResponse.statusCode {
         case 200...299:
             do {
-                return try decoder.decode(T.self, from: data)
+                let result = try decoder.decode(T.self, from: data)
+                print("✅ [APIClient] Successfully decoded response from \(endpoint)")
+                return result
             } catch {
                 // Log the raw response for debugging
                 if let jsonString = String(data: data, encoding: .utf8) {
-                    Self.logger.error("Decoding failed for endpoint: \(endpoint)")
-                    Self.logger.error("Response body: \(jsonString)")
+                    print("❌ [APIClient] Decoding failed for endpoint: \(endpoint)")
+                    print("❌ [APIClient] Response body: \(jsonString.prefix(500))...")
+                    print("❌ [APIClient] Decoding error: \(error)")
                 }
-                Self.logger.error("Decoding error: \(error.localizedDescription)")
                 throw APIClientError.decodingError(error)
             }
 
         case 400:
             let errorMessage = extractErrorMessage(from: data) ?? "Invalid request"
+            print("❌ [APIClient] 400 Bad Request: \(errorMessage)")
             throw APIClientError.badRequest(message: errorMessage)
 
         case 401:
             let errorMsg = extractErrorMessage(from: data) ?? "Authentication failed. Please sign in again."
-            Self.logger.error("API returned 401 Unauthorized: \(errorMsg)")
+            print("❌ [APIClient] 401 Unauthorized: \(errorMsg)")
             throw APIClientError.unauthorized(message: errorMsg)
 
         case 403:
             let errorMessage = extractErrorMessage(from: data) ?? "Access forbidden"
+            print("❌ [APIClient] 403 Forbidden: \(errorMessage)")
             throw APIClientError.forbidden(message: errorMessage)
 
         case 404:
+            print("❌ [APIClient] 404 Not Found")
             throw APIClientError.notFound
 
         case 500...599:
+            print("❌ [APIClient] Server error: \(httpResponse.statusCode)")
             throw APIClientError.serverError(httpResponse.statusCode)
 
         default:
+            print("❌ [APIClient] HTTP error: \(httpResponse.statusCode)")
             throw APIClientError.httpError(httpResponse.statusCode)
         }
     }

@@ -88,3 +88,40 @@ func formatPrice(_ priceStr: String, currency: String = "USD") -> String {
     formatter.maximumFractionDigits = 2
     return formatter.string(from: NSNumber(value: price)) ?? "—"
 }
+
+func formatIPODate(_ dateString: String) -> String {
+    let inputFormatter = DateFormatter()
+    inputFormatter.dateFormat = "yyyy-MM-dd"
+
+    guard let date = inputFormatter.date(from: dateString) else {
+        return dateString
+    }
+
+    let outputFormatter = DateFormatter()
+    outputFormatter.dateFormat = "yyyy, MMM dd"
+    return outputFormatter.string(from: date)
+}
+
+func getIPOAnniversaryYears(_ dateString: String) -> Int? {
+    let inputFormatter = DateFormatter()
+    inputFormatter.dateFormat = "yyyy-MM-dd"
+
+    guard let ipoDate = inputFormatter.date(from: dateString) else {
+        return nil
+    }
+
+    let calendar = Calendar.current
+    let today = Date()
+
+    // Check if today is the IPO birthday (same month and day)
+    let ipoComponents = calendar.dateComponents([.month, .day], from: ipoDate)
+    let todayComponents = calendar.dateComponents([.month, .day], from: today)
+
+    guard ipoComponents.month == todayComponents.month && ipoComponents.day == todayComponents.day else {
+        return nil
+    }
+
+    // Return the number of years since IPO
+    let yearComponents = calendar.dateComponents([.year], from: ipoDate, to: today)
+    return yearComponents.year
+}
