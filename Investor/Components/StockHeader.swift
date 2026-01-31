@@ -10,56 +10,105 @@ import Charts
 
 struct StockHeader: View {
     let overview: StockOverview
-    @State private var showChart = false
+    @State private var expanded = false
 
     var body: some View {
-        VStack(spacing: AppTheme.Spacing.xxs) {
-            
-            // Company Logo and Basic Info
-            HStack(spacing: AppTheme.Spacing.xxs) {
-                StockLogoImage(imageUrl: overview.profile.image, symbol: overview.symbol, size: 50)
-
-                VStack(alignment: .leading, spacing: AppTheme.Spacing.xxs) {
-                    if let companyName = overview.profile.companyName {
-                        Text(companyName)
-                            .font(.headline)
-                            .fontWeight(.semibold)
-                            .lineLimit(1)
-                    }
-                    Text(overview.symbol)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+            VStack() {
+            Button(action: {
+                if expanded == false {
+                    expanded.toggle()
                 }
+            }) {
                 
-                Button(action: { showChart.toggle() }) {
-                    VStack(spacing: AppTheme.Spacing.md) {
-                        if let price = overview.profile.price {
-                            Text(StockService.formatPrice(price, currency: overview.profile.currency))
-                                .font(.title2)
-                                .fontWeight(.bold)
+                VStack() {
+                    
+                    if expanded {
+                        Button(action: { expanded.toggle() }) {
+                            Text("Close")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .padding(AppTheme.Spacing.xs)
+                            
                         }
-                        Image(systemName: "chevron.down")
-                            .foregroundStyle(.blue)
-                            .rotationEffect(.degrees(showChart ? 180 : 0))
-                            .animation(.easeInOut(duration: 0.6), value: showChart)
+                        .glassEffect(.regular, in: .capsule)
+                        
                     }
-                    .frame(maxWidth: .infinity, alignment: .trailing)
-                }
-                .buttonStyle(.plain)
-                
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            
-            if showChart {
-                PriceChart(historicalPrice: overview.historicalPrice)
-                    .frame(height: 200)
-            }
+                    
+                    // Company Logo, name and price
+                    HStack() {
+                        StockLogoImage(imageUrl: overview.profile.image, symbol: overview.symbol, size: 50)
+                        
+                        VStack(alignment: .leading, spacing: AppTheme.Spacing.xxs) {
+                            if let companyName = overview.profile.companyName {
+                                Text(companyName)
+                                    .font(.headline)
+                                    .fontWeight(.semibold)
+                                    .lineLimit(1)
+                            }
+                            Text(overview.symbol)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                        
+                        VStack() {
+                            if let price = overview.profile.price {
+                                Text(StockService.formatPrice(price, currency: overview.profile.currency))
+                                    .font(.title2)
+                                    .fontWeight(.bold)
+                            }
+                        }
+                        .frame(maxWidth: .infinity, alignment: .trailing)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    
+                    if expanded {
+                        Divider().padding(.vertical, AppTheme.Spacing.md)
+                        ScrollView {
+                            PriceChart(historicalPrice: overview.historicalPrice)
+                                .frame(height: 200)
+                            
+                            // Additional Details
+                            VStack(alignment: .leading) {
+                                
+                                VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
+                                    if let sector = overview.profile.sector {
+                                        DetailItem(label: "Sector", value: sector)
+                                    }
+                                    if let industry = overview.profile.industry {
+                                        DetailItem(label: "Industry", value: industry)
+                                    }
+                                    if let ceo = overview.profile.ceo {
+                                        DetailItem(label: "CEO", value: ceo)
+                                    }
+                                    if let employees = overview.profile.employees {
+                                        DetailItem(label: "Employees", value: employees)
+                                    }
+                                    if let website = overview.profile.website {
+                                        DetailItem(label: "Website", value: website)
+                                    }
+                                    if let description = overview.profile.description {
+                                        DetailItem(label: "About", value: description)
+                                    }
+                                }
+                            }
+                            .padding(.top, AppTheme.Spacing.md)
+                        }
 
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(AppTheme.Spacing.md)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .glassEffect(.regular.interactive(), in: RoundedRectangle(cornerRadius: 20))
+            
+            if expanded == false {
+                StockTabs().padding(.bottom)
+            }
+            }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding()
-        .glassEffect(.regular.interactive(), in: RoundedRectangle(cornerRadius: 20))
-    }
+
 }
 
 // MARK: - Helper Components
@@ -190,13 +239,13 @@ struct DetailItem: View {
     let value: String
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 2) {
+        VStack(alignment: .leading) {
             Text(label)
                 .font(.caption)
                 .foregroundStyle(.secondary)
 
             Text(value)
-                .font(.callout)
+                .font(.caption)
         }
     }
 }
