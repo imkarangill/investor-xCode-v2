@@ -70,7 +70,7 @@ struct StockTileCard: View {
                     .padding(AppTheme.Spacing.sm)
             }
         }
-        .frame(width: 200)
+        .frame(width: 200, height: 220)
         .glassEffect(.regular.interactive(), in: RoundedRectangle(cornerRadius: 20))
         .padding(AppTheme.Spacing.sm)
     }

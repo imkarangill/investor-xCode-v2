@@ -148,12 +148,37 @@ struct PriceChart: View {
         let date: String
         let displayLabel: String
         let price: Double
+        let dateValue: Date  // Actual Date for chart x-axis
     }
 
     let historicalPrice: [String: [String: Double]]?
     @State private var selectedPeriod = "1Y"
 
-    let periods = ["1D", "1W", "1M", "3M", "6M", "1Y", "3Y", "5Y"]
+    let periods = ["1D", "1W", "1M", "3M", "1Y", "5Y"]
+
+    func formatDateForAxis(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+
+        switch selectedPeriod {
+        case "1D":
+            formatter.dateFormat = "HH:mm"
+        case "1W":
+            formatter.dateFormat = "EEE MM-dd"
+        case "1M":
+            formatter.dateFormat = "MMM"
+        case "3M":
+            formatter.dateFormat = "MMM"
+        case "1Y":
+            formatter.dateFormat = "MMM"
+        case "5Y":
+            formatter.dateFormat = "yyyy"
+        default:
+            formatter.dateFormat = "MMM yyyy"
+        }
+
+        return formatter.string(from: date)
+    }
 
     func formatLabel(dateString: String, period: String) -> String {
         if period == "1D" && dateString.contains("T") {
@@ -190,12 +215,34 @@ struct PriceChart: View {
             return []
         }
 
-        return periodData
+        let sortedData = periodData
             .sorted { $0.key < $1.key }
-            .map { dateString, price in
+            .compactMap { dateString, price -> PricePoint? in
                 let displayLabel = formatLabel(dateString: dateString, period: selectedPeriod)
-                return PricePoint(date: dateString, displayLabel: displayLabel, price: price)
+
+                // Parse date from string (handle both "YYYY-MM-DD" and "YYYY-MM-DDTHH:MM:SSZ" formats)
+                var parsedDate: Date?
+                let dateFormatter = DateFormatter()
+                dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+
+                if selectedPeriod == "1D" && dateString.contains("T") {
+                    // Format: "2026-01-30T09:30:00Z"
+                    dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
+                    parsedDate = dateFormatter.date(from: dateString)
+                } else {
+                    // Format: "2026-01-30"
+                    dateFormatter.dateFormat = "yyyy-MM-dd"
+                    parsedDate = dateFormatter.date(from: dateString)
+                }
+
+                guard let dateValue = parsedDate else {
+                    return nil
+                }
+
+                return PricePoint(date: dateString, displayLabel: displayLabel, price: price, dateValue: dateValue)
             }
+
+        return sortedData
     }
 
     var axisLabelDates: [String] {
@@ -224,7 +271,7 @@ struct PriceChart: View {
             } else {
                 Chart(chartData) { point in
                     LineMark(
-                        x: .value("Date", point.displayLabel),
+                        x: .value("Date", point.dateValue),
                         y: .value("Price", point.price)
                     )
                     .foregroundStyle(.blue)
@@ -235,8 +282,13 @@ struct PriceChart: View {
                     }
                 }
                 .chartXAxis {
-                    AxisMarks(position: .bottom, values: axisLabelDates) { _ in
-                        AxisValueLabel()
+                    AxisMarks(position: .bottom) { value in
+                        if let dateValue = value.as(Date.self) {
+                            let displayLabel = formatDateForAxis(dateValue)
+                            AxisValueLabel(displayLabel)
+                        } else {
+                            AxisValueLabel()
+                        }
                     }
                 }
                 .frame(height: 150)
@@ -250,12 +302,13 @@ struct PriceChart: View {
                             Text(period)
                                 .font(.caption)
                                 .foregroundStyle(selectedPeriod == period ? .blue : .secondary)
-                                .padding(.horizontal, AppTheme.Spacing.sm)
-                                .padding(.vertical, 6)
+                                .padding(.vertical, AppTheme.Spacing.sm)
+                                .padding(.horizontal, AppTheme.Spacing.s)
                         }
                     }
                 }
                 .padding(.horizontal, AppTheme.Spacing.md)
+                .frame(maxWidth: .infinity, alignment: .center)
             }
         }
         .padding()
