@@ -81,7 +81,6 @@ struct StockHeader: View {
                         Divider().padding(.vertical, AppTheme.Spacing.sm)
                         ScrollView {
                             PriceChart(historicalPrice: overview.historicalPrice)
-                                .frame(height: 200)
                             
                             // Additional Details
                             VStack(alignment: .leading) {
@@ -269,6 +268,13 @@ struct PriceChart: View {
                     .frame(maxWidth: .infinity, alignment: .center)
                     .frame(height: 150)
             } else {
+                let minPrice = chartData.map { $0.price }.min() ?? 0
+                let maxPrice = chartData.map { $0.price }.max() ?? 0
+                let priceRange = maxPrice - minPrice
+                let padding = priceRange * 0.05
+                let yAxisMin = max(0, minPrice - padding)
+                let yAxisMax = maxPrice + padding
+
                 Chart(chartData) { point in
                     LineMark(
                         x: .value("Date", point.dateValue),
@@ -276,21 +282,9 @@ struct PriceChart: View {
                     )
                     .foregroundStyle(.blue)
                 }
-                .chartYAxis {
-                    AxisMarks(position: .trailing) { _ in
-                        AxisValueLabel()
-                    }
-                }
-                .chartXAxis {
-                    AxisMarks(position: .bottom) { value in
-                        if let dateValue = value.as(Date.self) {
-                            let displayLabel = formatDateForAxis(dateValue)
-                            AxisValueLabel(displayLabel)
-                        } else {
-                            AxisValueLabel()
-                        }
-                    }
-                }
+                .chartYScale(domain: yAxisMin...yAxisMax)
+                .chartYAxis(.hidden)
+                .chartXAxis(.hidden)
                 .frame(height: 150)
             }
             
